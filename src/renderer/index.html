@@ -1,0 +1,4775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>qPilot</title>
+  <link rel="icon" type="image/png" href="../assets/qPilot-app-logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/phosphor/style.css">
+
+  <style>
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-page: #08090f;
+      --bg-titlebar: #0a0b12;
+      --bg-sidebar: #0e0f17;
+      --border-sidebar: #1d1f2e;
+      --bg-main: #08090f;
+      --bg-card: #131420;
+      --bg-card-header: rgba(255, 255, 255, 0.02);
+      --bg-card-hover: #171827;
+      --bg-pill: #151623;
+      --border-subtle: #1c1e2d;
+      --border-card: #222436;
+      --border-card-hover: rgba(99, 102, 241, 0.45);
+      --border-active: #6366f1;
+      --text-white: #ffffff;
+      --text-body: #d4d5e2;
+      --text-muted: #828499;
+      --text-dim: #585a6f;
+      --accent-blue: #6366f1;
+      --accent-blue-hover: #4f46e5;
+      --accent-blue-glow: rgba(99, 102, 241, 0.35);
+      --accent-green: #22c55e;
+      --accent-red: #f87171;
+      --radius-card: 16px;
+      --radius-pill: 20px;
+      --radius-sm: 8px;
+      --font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'Geist Mono', monospace;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #252535;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: background 0.2s ease;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3e3e56;
+    }
+    ::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #252535 transparent;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      background-image:
+        radial-gradient(900px circle at 85% 5%, rgba(99, 102, 241, 0.09) 0%, transparent 65%),
+        radial-gradient(700px circle at 10% 90%, rgba(139, 92, 246, 0.07) 0%, transparent 60%);
+      color: var(--text-body);
+      font-family: var(--font-family);
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .titlebar {
+      height: 38px;
+      background: var(--bg-titlebar);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      -webkit-app-region: drag;
+      border-bottom: 1px solid #191b28;
+      z-index: 1000;
+      flex-shrink: 0;
+    }
+
+    .titlebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #e0e0ea;
+      letter-spacing: -0.2px;
+      user-select: none;
+    }
+
+    .titlebar-brand-icon {
+      width: 17px;
+      height: 17px;
+      border-radius: 4px;
+      object-fit: contain;
+      display: block;
+      flex-shrink: 0;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .window-controls {
+      display: flex;
+      align-items: center;
+      -webkit-app-region: no-drag;
+      gap: 3px;
+    }
+
+    .win-btn {
+      width: 36px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid transparent;
+      color: #9292a4;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .win-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+    }
+
+    .win-btn.close:hover {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+
+    .app-shell {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .app-sidebar {
+      width: 200px;
+      min-width: 200px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border-sidebar);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 14px 16px;
+      flex-shrink: 0;
+      box-shadow: 2px 0 16px rgba(0, 0, 0, 0.35);
+      z-index: 10;
+    }
+
+    .sidebar-top {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-brand-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 22px;
+      padding: 6px 4px;
+      user-select: none;
+      cursor: default;
+    }
+
+    .sidebar-long-logo {
+      height: 35px;
+      max-width: 145px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #828294;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      border: 1px solid transparent;
+      user-select: none;
+    }
+
+    .nav-item:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(99, 102, 241, 0.08) 100%);
+      border-color: rgba(129, 140, 248, 0.35);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 0 16px rgba(99, 102, 241, 0.15);
+    }
+
+    .nav-item i,
+    .nav-item svg {
+      flex-shrink: 0;
+    }
+
+    .sidebar-bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+    }
+
+    .connection-status-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+      flex-shrink: 0;
+    }
+
+    .connection-status-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.25;
+    }
+
+    .status-line-1 {
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .status-line-2 {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .sidebar-user-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: #141522;
+      border: 1px solid #222536;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      user-select: none;
+    }
+
+    .sidebar-user-pill:hover {
+      background: #18192a;
+      border-color: rgba(99, 102, 241, 0.35);
+    }
+
+    .sidebar-user-left {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .user-avatar-circle {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #252530;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .user-pill-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100px;
+    }
+
+    .sidebar-user-pill svg {
+      color: #727282;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .sidebar-user-pill.open svg {
+      transform: rotate(180deg);
+    }
+
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+      background: radial-gradient(1000px circle at 85% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 65%),
+                  radial-gradient(750px circle at 15% 95%, rgba(139, 92, 246, 0.05) 0%, transparent 60%),
+                  var(--bg-main);
+    }
+
+    .main-header {
+      padding: 24px 32px 18px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-shrink: 0;
+      gap: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .header-text-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header-main-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-white);
+      letter-spacing: -0.6px;
+      line-height: 1.15;
+    }
+
+    .header-main-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    .header-controls-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .armed-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      border-radius: var(--radius-pill);
+      background: #141522;
+      border: 1px solid #26283d;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-white);
+      transition: all 0.2s ease;
+    }
+
+    .armed-status-pill.active {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.22) 0%, rgba(79, 70, 229, 0.16) 100%);
+      color: #ffffff;
+      border-color: rgba(129, 140, 248, 0.45);
+      box-shadow: 0 0 16px rgba(99, 102, 241, 0.25), 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .armed-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+    }
+
+    .armed-status-pill.active .armed-dot {
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.85);
+    }
+
+    .search-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      color: #7e819b;
+      pointer-events: none;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .server-search-input {
+      background: #141522;
+      border: 1px solid #26283d;
+      border-radius: 10px;
+      padding: 8px 14px 8px 34px;
+      font-size: 13px;
+      font-family: var(--font-family);
+      color: var(--text-white);
+      outline: none;
+      width: 210px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .server-search-input:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2), 0 4px 12px rgba(0, 0, 0, 0.35);
+      width: 250px;
+    }
+
+    .server-search-input::placeholder {
+      color: #626274;
+    }
+
+    .add-server-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.4), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .add-server-btn:hover {
+      background: linear-gradient(135deg, #7174ff 0%, #584feb 100%);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.55), 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+      transform: translateY(-1px);
+    }
+
+    .add-server-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .content-grid {
+      flex: 1;
+      display: flex;
+      gap: 22px;
+      padding: 0 32px 24px;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .waitlists-column {
+      flex: 1;
+      min-height: 0;
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .waitlists-column::-webkit-scrollbar,
+    .activity-scroll-body::-webkit-scrollbar {
+      width: 5px;
+    }
+    .waitlists-column::-webkit-scrollbar-track,
+    .activity-scroll-body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .waitlists-column::-webkit-scrollbar-thumb,
+    .activity-scroll-body::-webkit-scrollbar-thumb {
+      background: #20202a;
+      border-radius: 4px;
+    }
+    .waitlists-column::-webkit-scrollbar-thumb:hover,
+    .activity-scroll-body::-webkit-scrollbar-thumb:hover {
+      background: #30303c;
+    }
+
+    .server-card {
+      background: linear-gradient(180deg, #151624 0%, #11121d 100%);
+      border: 1px solid #232538;
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      flex-shrink: 0;
+      width: 100%;
+      box-sizing: border-box;
+      box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .server-card:hover {
+      border-color: rgba(99, 102, 241, 0.45);
+      box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.7), 0 0 24px rgba(99, 102, 241, 0.12), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+    }
+
+    .server-card-header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      background: rgba(255, 255, 255, 0.015);
+      min-height: 64px;
+      flex-shrink: 0;
+      transition: background 0.15s ease;
+      border-bottom: 1px solid #1a1c2c;
+    }
+
+    .server-card-header:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .server-header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .server-icon-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: #181824;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .server-icon-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .server-title-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-white);
+      line-height: 1.25;
+    }
+
+    .server-sub-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .server-queue-count {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .status-badge-capsule {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #13221a;
+      border: 1px solid #1a3a28;
+      color: #4ade80;
+    }
+
+    .status-badge-capsule.offline {
+      background: #181820;
+      border-color: #282834;
+      color: #757585;
+    }
+
+    .capsule-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .chevron-icon {
+      color: #6e6e7e;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .server-card.collapsed .chevron-icon {
+      transform: rotate(180deg);
+    }
+
+    .server-channels-list {
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid #1a1c2c;
+      max-height: 1200px;
+      opacity: 1;
+      overflow: hidden;
+      transition: max-height 0.26s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+    }
+
+    .server-card.collapsed .server-channels-list {
+      max-height: 0;
+      opacity: 0;
+      border-top-color: transparent;
+      pointer-events: none;
+    }
+
+    .channel-row {
+      padding: 13px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #1a1c2c;
+      min-height: 56px;
+      flex-shrink: 0;
+      transition: background 0.18s ease;
+    }
+
+    .channel-row:last-child {
+      border-bottom: none;
+    }
+
+    .channel-row:hover {
+      background: rgba(99, 102, 241, 0.06);
+    }
+
+    .channel-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .channel-globe-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #181928;
+      border: 1px solid #282a40;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #83859d;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .channel-globe-icon.armed {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(79, 70, 229, 0.2) 100%);
+      border-color: rgba(129, 140, 248, 0.5);
+      color: #c7d2fe;
+      box-shadow: 0 0 14px rgba(99, 102, 241, 0.35);
+    }
+
+    .channel-name-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .channel-region-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-white);
+      line-height: 1.25;
+    }
+
+    .channel-hash-subname {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .channel-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .joined-status-badge {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #9da0b5;
+    }
+
+    .joined-status-badge.show {
+      display: inline-flex;
+    }
+
+    .toggle-switch-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modern-switch {
+      width: 44px;
+      height: 24px;
+      background: #1c1e2c;
+      border: 1px solid #2b2e42;
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      padding: 2px;
+      flex-shrink: 0;
+    }
+
+    .modern-switch.armed {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      border-color: rgba(129, 140, 248, 0.5);
+      box-shadow: 0 0 14px rgba(99, 102, 241, 0.45);
+    }
+
+    .switch-knob {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #626478;
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), background 0.22s ease;
+      transform: translateX(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+    }
+
+    .modern-switch.armed .switch-knob {
+      transform: translateX(20px);
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .switch-state-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      width: 44px;
+      transition: color 0.18s ease;
+    }
+
+    .modern-switch.armed + .switch-state-label {
+      color: #c7d2fe;
+      font-weight: 600;
+    }
+
+    .channel-arrow-chevron {
+      color: #555565;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .activity-panel {
+      width: 340px;
+      min-width: 320px;
+      max-width: 380px;
+      background: linear-gradient(180deg, #151624 0%, #11121d 100%);
+      border: 1px solid #232538;
+      border-radius: var(--radius-card);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      height: 100%;
+      flex-shrink: 0;
+      box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+    }
+
+    .activity-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-shrink: 0;
+    }
+
+    .activity-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-white);
+    }
+
+    .pulse-icon {
+      color: #818cf8;
+      filter: drop-shadow(0 0 6px rgba(129, 140, 248, 0.45));
+    }
+
+    .clear-logs-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: #1a1b2c;
+      border: 1px solid #2a2d44;
+      border-radius: var(--radius-pill);
+      color: #9da0b8;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .clear-logs-btn:hover {
+      background: #23253b;
+      color: #ffffff;
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    .activity-scroll-body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+      padding-right: 4px;
+    }
+
+    .timeline-track-line {
+      position: absolute;
+      left: 58px;
+      top: 14px;
+      bottom: 14px;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(99, 102, 241, 0.5) 0%, rgba(45, 48, 75, 0.4) 100%);
+      z-index: 1;
+    }
+
+    .timeline-events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .timeline-event-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 13px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .event-timestamp {
+      width: 42px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #656578;
+      text-align: right;
+      flex-shrink: 0;
+      padding-top: 1px;
+    }
+
+    .event-node-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #5865f2;
+      box-shadow: 0 0 8px rgba(88, 101, 242, 0.6);
+      border: 2px solid var(--bg-card);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .event-node-dot.red {
+      background: var(--accent-red);
+      box-shadow: 0 0 8px rgba(248, 113, 113, 0.6);
+    }
+
+    .event-node-dot.green {
+      background: var(--accent-green);
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+    }
+
+    .event-content-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .event-title-line {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      color: #e2e2ec;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .event-account-pill {
+      font-size: 11px;
+      font-weight: 600;
+      color: #8da4ff;
+      background: rgba(88, 101, 242, 0.12);
+      border: 1px solid rgba(88, 101, 242, 0.28);
+      border-radius: 5px;
+      padding: 0 5px;
+      line-height: 1.5;
+    }
+
+    .event-subtitle-line {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+      line-height: 1.3;
+    }
+
+    .scanning-banner {
+      margin: 0 32px 14px;
+      background: #111116;
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: #b5b5c5;
+      flex-shrink: 0;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .spinner-ring {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .empty-state-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .empty-icon-card {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: #131318;
+      border: 1px solid #22222e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #656575;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .empty-brand-logo {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      opacity: 0.85;
+      filter: drop-shadow(0 0 16px rgba(88, 101, 242, 0.35));
+    }
+
+    .empty-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .empty-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 320px;
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+
+    .rescan-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 12px;
+      background: transparent;
+      border: 1px solid #282836;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .rescan-btn:hover {
+      background: #181822;
+      border-color: #383848;
+    }
+
+    .account-dropdown {
+      position: absolute;
+      bottom: 65px;
+      left: 14px;
+      width: 320px;
+      background: #111116;
+      border: 1px solid #242432;
+      border-radius: 18px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: dropDownIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .account-dropdown.show {
+      display: flex;
+    }
+
+    @keyframes dropDownIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .dropdown-header {
+      padding: 14px 16px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .dropdown-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .dropdown-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .add-account-mini-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      background: #1c1c24;
+      border: 1px solid #2e2e3c;
+      border-radius: 12px;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .add-account-mini-btn:hover {
+      background: #282834;
+      border-color: #3e3e4e;
+    }
+
+    .accounts-list {
+      max-height: 240px;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .account-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      background: transparent;
+      user-select: none;
+    }
+
+    .account-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .account-item.active {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .account-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .account-avatar-wrap {
+      position: relative;
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .account-avatar-img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #181822;
+    }
+
+    .account-status-dot {
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #505060;
+      border: 2px solid #111116;
+    }
+
+    .account-status-dot.online {
+      background: var(--accent-green);
+      box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+    }
+
+    .account-info {
+      min-width: 0;
+    }
+
+    .account-display-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 130px;
+    }
+
+    .account-subtext {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 130px;
+    }
+
+    .account-item-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .active-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 2px 7px;
+      border-radius: 8px;
+    }
+
+    .switch-btn {
+      font-size: 11px;
+      font-weight: 600;
+      color: #a0a0b2;
+      background: transparent;
+      border: 1px solid #2e2e3c;
+      border-radius: 8px;
+      padding: 2px 7px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .switch-btn:hover {
+      background: #242430;
+      color: #ffffff;
+    }
+
+    .remove-account-btn {
+      background: transparent;
+      border: none;
+      color: #606070;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .remove-account-btn:hover {
+      color: #ff5555;
+      background: rgba(255, 85, 85, 0.1);
+    }
+
+    .dropdown-footer {
+      padding: 12px 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .arm-all-toggle-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .arm-all-label {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .arm-all-label span:first-child {
+      font-size: 12px;
+      font-weight: 600;
+      color: #e2e2ec;
+    }
+
+    .arm-all-hint {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .switch-small {
+      position: relative;
+      display: inline-block;
+      width: 34px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .switch-small input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider-small {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #282834;
+      transition: 0.22s;
+      border-radius: 18px;
+    }
+
+    .slider-small:before {
+      position: absolute;
+      content: "";
+      height: 12px;
+      width: 12px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.22s;
+      border-radius: 50%;
+    }
+
+    .switch-small input:checked + .slider-small {
+      background-color: var(--accent-blue);
+    }
+
+    .switch-small input:checked + .slider-small:before {
+      transform: translateX(16px);
+    }
+
+    .sign-out-all-btn {
+      width: 100%;
+      padding: 7px 12px;
+      background: transparent;
+      border: 1px solid #262634;
+      border-radius: 10px;
+      font-size: 11px;
+      color: #888898;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: all 0.15s ease;
+    }
+
+    .sign-out-all-btn:hover {
+      background: rgba(255, 85, 85, 0.08);
+      border-color: rgba(255, 85, 85, 0.25);
+      color: #ff6666;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(4, 4, 6, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-card {
+      width: 480px;
+      max-width: 90vw;
+      background: #111116;
+      border: 1px solid #242432;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      animation: modalScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalScaleIn {
+      from { opacity: 0; transform: scale(0.95) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .modal-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .modal-badge-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: #181822;
+      border: 1px solid #2c2c3c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .modal-brand-icon {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .modal-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: #707080;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .modal-close-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .login-input-group {
+      background: #16161e;
+      border: 1px solid #262634;
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: border-color 0.2s ease;
+    }
+
+    .login-input-group:focus-within {
+      border-color: #5865f2;
+    }
+
+    .modal-token-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-white);
+      font-size: 13px;
+      font-family: var(--font-mono);
+    }
+
+    .eye-toggle-btn {
+      background: transparent;
+      border: none;
+      color: #707080;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .eye-toggle-btn:hover {
+      color: #ffffff;
+    }
+
+    .login-error-text {
+      font-size: 12px;
+      color: #f87171;
+      display: none;
+    }
+
+    .discord-helper-box {
+      background: #14141c;
+      border: 1px solid #20202c;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .helper-box-title {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .helper-keys-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: #9da0b5;
+    }
+
+    .kbd-chip {
+      background: #20202c;
+      border: 1px solid #2c2c3c;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .helper-code-container {
+      background: #0d0d12;
+      border: 1px solid #1c1c28;
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .helper-code-text {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #8da4ff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .copy-snippet-btn {
+      background: #1c1c28;
+      border: 1px solid #2a2a3a;
+      border-radius: 6px;
+      color: #ffffff;
+      padding: 4px 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .copy-snippet-btn:hover {
+      background: #28283a;
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .modal-cancel-btn {
+      padding: 9px 18px;
+      background: transparent;
+      border: 1px solid #262634;
+      border-radius: 12px;
+      color: #a0a0b2;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .modal-cancel-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+    }
+
+    .modal-submit-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 18px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.4), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .modal-submit-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #7174ff 0%, #584feb 100%);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.55), 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+      transform: translateY(-1px);
+    }
+
+    .modal-submit-btn:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .modal-submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .drawer-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(3, 3, 7, 0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 1400;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .settings-drawer {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 380px;
+      background: #101016;
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: -16px 0 50px rgba(0, 0, 0, 0.8), -1px 0 0 rgba(255, 255, 255, 0.04);
+      z-index: 1500;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .settings-drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .drawer-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .drawer-close-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: #88889a;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .drawer-close-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+    }
+
+    .drawer-body {
+      flex: 1;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      overflow-y: auto;
+    }
+
+    .drawer-body::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .drawer-body::-webkit-scrollbar-track {
+      background: #09090d;
+    }
+
+    .drawer-body::-webkit-scrollbar-thumb {
+      background: #262638;
+      border-radius: 10px;
+    }
+
+    .drawer-body::-webkit-scrollbar-thumb:hover {
+      background: #444462;
+    }
+
+    .custom-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .custom-field-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: #707082;
+      text-transform: uppercase;
+    }
+
+    .custom-field-hint {
+      font-size: 11px;
+      color: #606070;
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+
+    .custom-modal-select,
+    .custom-modal-input {
+      width: 100%;
+      height: 42px;
+      background: #14141c;
+      border: 1px solid #232332;
+      border-radius: 10px;
+      padding: 0 14px;
+      color: #ffffff;
+      font-family: var(--font-family);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.18s ease;
+      box-sizing: border-box;
+    }
+
+    .custom-modal-select:focus,
+    .custom-modal-input:focus {
+      border-color: #5865f2;
+    }
+
+    .custom-modal-select option {
+      background: #14141c;
+      color: #ffffff;
+    }
+
+    .setting-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .setting-row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .setting-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .setting-badge {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff;
+      background: #1a1a24;
+      border: 1px solid #2a2a38;
+      border-radius: 8px;
+      padding: 3px 10px;
+    }
+
+    .custom-range {
+      width: 100%;
+      height: 6px;
+      background: #242432;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .custom-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      cursor: pointer;
+    }
+
+    .slider-limits {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #555565;
+      font-family: var(--font-mono);
+      margin-top: 4px;
+    }
+
+    .setting-explanation {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .drawer-footer {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .save-settings-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 20px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.4), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .save-settings-btn:hover {
+      background: linear-gradient(135deg, #7174ff 0%, #584feb 100%);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.55), 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+      transform: translateY(-1px);
+    }
+
+    .save-settings-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .login-view {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(180deg, rgba(6, 7, 12, 0.74) 0%, rgba(4, 5, 10, 0.86) 100%),
+                  url('../assets/background.jpg') center/cover no-repeat;
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .login-card {
+      width: 940px;
+      max-width: 95vw;
+      min-height: 570px;
+      background: rgba(15, 16, 25, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      display: flex;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      animation: modalScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .login-left {
+      width: 390px;
+      min-width: 390px;
+      max-width: 390px;
+      flex-shrink: 0;
+      background: #0b0b10;
+      border-right: 1px solid #1c1c28;
+      padding: 44px 38px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .radar-bg-art {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .login-left-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-between;
+    }
+
+    .login-brand-hero {
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+    }
+
+    .login-long-logo {
+      height: 46px;
+      width: auto;
+      max-width: 230px;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.6));
+    }
+
+    .login-app-desc {
+      font-size: 13.5px;
+      color: #7e7e90;
+      line-height: 1.5;
+      margin-bottom: 32px;
+    }
+
+    .login-features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: rgba(18, 20, 32, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 18px 20px;
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 24px rgba(88, 101, 242, 0.04);
+      position: relative;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .feature-icon-box {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: rgba(88, 101, 242, 0.09);
+      border: 1px solid rgba(88, 101, 242, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9cb1ff;
+      flex-shrink: 0;
+    }
+
+    .feature-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 1.25;
+    }
+
+    .feature-desc {
+      font-size: 11.5px;
+      color: #828296;
+      margin-top: 3px;
+      line-height: 1.35;
+    }
+
+    .login-right {
+      flex: 1;
+      min-width: 0;
+      padding: 44px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #0f0f15;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .login-category-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #656578;
+      margin-bottom: 8px;
+    }
+
+    .login-heading {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .login-subheading {
+      font-size: 13px;
+      color: #7e7e90;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .login-input-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #656578;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .token-input-wrapper {
+      background: #13131a;
+      border: 1px solid #222230;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      height: 46px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .token-input-wrapper:focus-within {
+      border-color: #5865f2;
+      box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.18);
+    }
+
+    .token-input-key-icon {
+      color: #656578;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .token-input-real {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 13.5px;
+      font-family: var(--font-family);
+    }
+
+    .token-input-real::placeholder {
+      color: #4e4e5e;
+    }
+
+    .token-eye-btn {
+      background: transparent;
+      border: none;
+      color: #656578;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      transition: color 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .token-eye-btn:hover {
+      color: #a4a4b4;
+    }
+
+    .login-connect-btn {
+      height: 46px;
+      margin-top: 14px;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.4), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: var(--font-family);
+      user-select: none;
+    }
+
+    .login-connect-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #7174ff 0%, #584feb 100%);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.55), 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+      transform: translateY(-1px);
+    }
+
+    .login-connect-btn:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .login-connect-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .login-error-text {
+      color: #f87171;
+      font-size: 12px;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .login-divider-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 20px 0;
+    }
+
+    .login-divider-line {
+      flex: 1;
+      height: 1px;
+      background: #1e1e28;
+    }
+
+    .login-divider-text {
+      font-size: 11px;
+      font-weight: 700;
+      color: #555566;
+      letter-spacing: 0.5px;
+    }
+
+    .discord-helper-box {
+      background: #111116;
+      border: 1px solid #1c1c26;
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .helper-box-title {
+      font-size: 12px;
+      color: #828292;
+      margin-bottom: 8px;
+    }
+
+    .helper-keys-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .kbd-chip {
+      background: #181820;
+      border: 1px solid #2c2c38;
+      border-radius: 5px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #d0d0dc;
+    }
+
+    .arrow-chip {
+      color: #5c5c6c;
+      font-size: 12px;
+    }
+
+    .helper-action-text {
+      color: #8a8a9a;
+      font-size: 12px;
+    }
+
+    .helper-code-container {
+      margin-top: 10px;
+      background: #0a0a0e;
+      border: 1px solid #181822;
+      border-radius: 8px;
+      padding: 10px 38px 10px 12px;
+      position: relative;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .helper-code-text {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: #727282;
+      line-height: 1.55;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+
+    .copy-snippet-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: #181822;
+      border: 1px solid #282836;
+      color: #858596;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .copy-snippet-btn:hover {
+      background: #222230;
+      color: #ffffff;
+      border-color: #383848;
+    }
+
+    .copy-feedback-tooltip {
+      position: absolute;
+      right: 38px;
+      top: 10px;
+      background: #5865f2;
+      color: #ffffff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 600;
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .pause-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 13px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fbbf24;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.18s ease;
+    }
+
+    .pause-status-pill:hover {
+      background: rgba(245, 158, 11, 0.22);
+      border-color: rgba(245, 158, 11, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .pause-status-pill.idle {
+      background: rgba(168, 85, 247, 0.12);
+      border-color: rgba(168, 85, 247, 0.35);
+      color: #c084fc;
+      cursor: default;
+    }
+
+    .pause-status-pill.idle:hover {
+      transform: none;
+    }
+
+    .pause-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #fbbf24;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+      animation: pulseGlow 1.8s infinite ease-in-out;
+    }
+
+    .pause-dot.purple {
+      background: #c084fc;
+      box-shadow: 0 0 8px rgba(168, 85, 247, 0.8);
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.55; transform: scale(0.85); }
+    }
+
+    .setting-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.05);
+      margin: 4px 0;
+    }
+
+    .setting-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #727282;
+      margin-top: 4px;
+    }
+
+    .setting-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .setting-toggle-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .setting-sublabel {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    .queue-entered-card {
+      width: 500px;
+      max-width: 92vw;
+      background: #0f1017;
+      border: 1px solid #23273e;
+      border-radius: 22px;
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(88, 101, 242, 0.15);
+      padding: 26px 28px;
+      animation: modalScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .queue-celebrate-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .queue-celebrate-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+    }
+
+    .queue-entered-body {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .queue-target-box {
+      background: #141622;
+      border: 1px solid #202438;
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .queue-target-left {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .queue-target-guild {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .queue-target-region {
+      font-size: 12px;
+      color: #888898;
+    }
+
+    .queue-stat-pill {
+      padding: 4px 10px;
+      background: rgba(88, 101, 242, 0.15);
+      border: 1px solid rgba(88, 101, 242, 0.3);
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #9cb1ff;
+    }
+
+    .queue-cooldown-notice {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .notice-icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .notice-content {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .notice-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fbbf24;
+    }
+
+    .notice-desc {
+      font-size: 12px;
+      color: #d1d5db;
+      line-height: 1.4;
+    }
+
+    .notice-timer {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #fbbf24;
+      margin-top: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .queue-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .resume-now-btn {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+      padding: 9px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .resume-now-btn:hover {
+      background: rgba(245, 158, 11, 0.2);
+      color: #ffffff;
+      border-color: rgba(245, 158, 11, 0.6);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="titlebar">
+    <div class="titlebar-brand">
+      <img src="../assets/qPilot-app-logo.png" class="titlebar-brand-icon" alt="qPilot">
+      <span>qPilot</span>
+    </div>
+    <div class="window-controls">
+      <button class="win-btn" onclick="window.api.minimizeWindow()" title="Minimize"><i class="ph ph-minus"></i></button>
+      <button class="win-btn" onclick="window.api.maximizeWindow()" title="Maximize"><i class="ph ph-square"></i></button>
+      <button class="win-btn close" onclick="window.api.closeWindow()" title="Close"><i class="ph ph-x"></i></button>
+    </div>
+  </div>
+
+  <div class="app-shell">
+
+    <aside class="app-sidebar">
+      <div class="sidebar-top">
+
+        <div class="sidebar-brand-container" title="qPilot">
+          <img src="../assets/qPilot-app-textlogo.png" class="sidebar-long-logo" alt="qPilot">
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="nav-item active" id="tabWaitlists" onclick="selectNavTab('waitlists')">
+            <i class="ph ph-list-bullets" style="font-size: 16px;"></i>
+            <span>Waitlists</span>
+          </div>
+
+          <div class="nav-item" id="tabSettings" onclick="selectNavTab('settings')">
+            <i class="ph ph-gear" style="font-size: 16px;"></i>
+            <span>Settings</span>
+          </div>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+
+        <div class="connection-status-wrap">
+          <div class="status-dot"></div>
+          <div class="connection-status-text">
+            <span class="status-line-1">Connected</span>
+            <span class="status-line-2">to Discord</span>
+          </div>
+        </div>
+
+        <div class="sidebar-user-pill" id="userPill" onclick="toggleAccountDropdown(event)">
+          <div class="sidebar-user-left">
+            <img class="user-avatar-circle" id="userAvatarImg" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="User">
+            <span class="user-pill-name" id="accountName">Discord</span>
+          </div>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </div>
+
+        <div class="account-dropdown" id="accountDropdown">
+          <div class="dropdown-header">
+            <div class="dropdown-title-wrap">
+              <div class="dropdown-title">Accounts</div>
+              <div class="dropdown-subtitle" id="accountsSubtitle">1 active</div>
+            </div>
+            <button class="add-account-mini-btn" onclick="openAddAccountModal(event)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add
+            </button>
+          </div>
+
+          <div class="accounts-list" id="accountsList">
+
+          </div>
+
+          <div class="dropdown-footer">
+            <div class="arm-all-toggle-wrap">
+              <div class="arm-all-label">
+                <span>Snipe with all accounts</span>
+                <span class="arm-all-hint">All accounts click simultaneously</span>
+              </div>
+              <label class="switch-small">
+                <input type="checkbox" id="snipeAllAccountsCheck" checked onchange="toggleSnipeAll(this.checked)">
+                <span class="slider-small"></span>
+              </label>
+            </div>
+            <button class="sign-out-all-btn" onclick="signOutAll()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              Sign out of all accounts
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="app-main">
+
+      <header class="main-header">
+        <div class="header-text-group">
+          <h1 class="header-main-title">Waitlists</h1>
+          <p class="header-main-desc">Monitor your favorite servers and get into queues instantly.</p>
+        </div>
+
+        <div class="header-controls-group">
+
+          <div class="pause-status-pill" id="queuePausedPill" style="display: none;" onclick="resumeSnipingNow()" title="Click to resume queue sniping">
+            <div class="pause-dot amber"></div>
+            <span id="queuePausedPillText">Paused (60m)</span>
+          </div>
+
+          <div class="pause-status-pill idle" id="idlePausedPill" style="display: none;" title="PC is idle: move mouse or press any key to resume">
+            <div class="pause-dot purple"></div>
+            <span>Paused (PC Idle)</span>
+          </div>
+
+          <div class="armed-status-pill" id="armedBadge">
+            <div class="armed-dot"></div>
+            <span id="armedBadgeText">0 armed</span>
+          </div>
+
+          <div class="search-input-wrap">
+            <svg class="search-icon" width="14" height="14" viewBox="0 0 256 256" fill="currentColor">
+              <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/>
+            </svg>
+            <input type="text" class="server-search-input" id="serverSearchInput" placeholder="Search servers..." oninput="handleServerSearch(this.value)">
+          </div>
+
+          <button class="add-server-btn" onclick="openAddCustomModal()">
+            <i class="ph ph-plus" style="font-size: 14px;"></i>
+            <span>Add server</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="scanning-banner" id="scanningBanner" style="display: none;">
+        <div class="spinner-ring"></div>
+        <span>Scanning accessible waitlist channels...</span>
+      </div>
+
+      <div class="content-grid" id="dashboardView">
+
+        <div class="waitlists-column" id="waitlistsContainer">
+
+        </div>
+
+        <div class="activity-panel">
+          <div class="activity-panel-header">
+            <div class="activity-title-group">
+              <i class="ph ph-activity pulse-icon" style="font-size: 16px;"></i>
+              <span>Activity</span>
+            </div>
+            <button class="clear-logs-btn" onclick="clearActivityLog()">
+              <i class="ph ph-trash" style="font-size: 12px;"></i>
+              <span>Clear</span>
+            </button>
+          </div>
+
+          <div class="activity-scroll-body" id="activityScrollBody">
+            <div class="timeline-track-line"></div>
+            <div class="timeline-events-list" id="activityLog">
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="empty-state-view" id="emptyStateView" style="display: none;">
+        <div class="empty-icon-card">
+          <img src="../assets/qPilot-app-logo.png" class="empty-brand-logo" alt="qPilot">
+        </div>
+        <div class="empty-title">No accessible waitlists found</div>
+        <div class="empty-subtitle">Join a supported PvPTiers or MCTiers server with accessible waitlist channels, then rescan.</div>
+        <button class="rescan-btn" onclick="rescanServers()">
+          <i class="ph ph-arrows-clockwise" style="font-size: 14px;"></i>
+          <span>Rescan servers</span>
+        </button>
+      </div>
+
+    </main>
+
+    <div class="drawer-backdrop" id="drawerBackdrop" onclick="toggleSettingsDrawer(false)"></div>
+
+    <div class="settings-drawer" id="settingsDrawer">
+      <div class="drawer-header">
+        <div class="drawer-title">Click settings</div>
+        <button class="drawer-close-btn" onclick="toggleSettingsDrawer(false)"><i class="ph ph-x"></i></button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="setting-group">
+          <div class="setting-row-top">
+            <span class="setting-label">Clicks per second</span>
+            <span class="setting-badge" id="badgeCps">100/s</span>
+          </div>
+          <div class="slider-track-wrap">
+            <input type="range" class="custom-range" id="sliderCps" min="1" max="100" step="1" value="100" oninput="updateSettingsUI()">
+            <div class="slider-limits">
+              <span>1</span>
+              <span>100</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <div class="setting-row-top">
+            <span class="setting-label">Burst length</span>
+            <span class="setting-badge" id="badgeBurst">3.0 s</span>
+          </div>
+          <div class="slider-track-wrap">
+            <input type="range" class="custom-range" id="sliderBurst" min="0.1" max="10" step="0.1" value="3" oninput="updateSettingsUI()">
+            <div class="slider-limits">
+              <span>0.1 s</span>
+              <span>10 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <div class="setting-row-top">
+            <span class="setting-label">Cooldown after a burst</span>
+            <span class="setting-badge" id="badgeCooldown">60 s</span>
+          </div>
+          <div class="slider-track-wrap">
+            <input type="range" class="custom-range" id="sliderCooldown" min="5" max="300" step="1" value="60" oninput="updateSettingsUI()">
+            <div class="slider-limits">
+              <span>5 s</span>
+              <span>300 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-divider"></div>
+        <div class="setting-section-title">Queue Protection</div>
+
+        <div class="setting-toggle-row">
+          <div class="setting-toggle-info">
+            <span class="setting-label">Pause other tierlists after joining</span>
+            <span class="setting-sublabel">Temporarily pauses all queues once you enter one</span>
+          </div>
+          <label class="switch-small">
+            <input type="checkbox" id="checkPauseAfterJoin" checked onchange="updateSettingsUI()">
+            <span class="slider-small"></span>
+          </label>
+        </div>
+
+        <div class="setting-group" id="groupPauseDuration">
+          <div class="setting-row-top">
+            <span class="setting-label">Pause cooldown duration</span>
+            <span class="setting-badge" id="badgePauseDuration">60 min (1 hr)</span>
+          </div>
+          <div class="slider-track-wrap">
+            <input type="range" class="custom-range" id="sliderPauseDuration" min="5" max="240" step="5" value="60" oninput="updateSettingsUI()">
+            <div class="slider-limits">
+              <span>5 min</span>
+              <span>4 hrs</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-divider"></div>
+        <div class="setting-section-title">Idle Detection</div>
+
+        <div class="setting-toggle-row">
+          <div class="setting-toggle-info">
+            <span class="setting-label">Pause sniping when PC is idle</span>
+            <span class="setting-sublabel">Pauses queue joining when no mouse or keyboard input is detected</span>
+          </div>
+          <label class="switch-small">
+            <input type="checkbox" id="checkPauseOnIdle" checked onchange="updateSettingsUI()">
+            <span class="slider-small"></span>
+          </label>
+        </div>
+
+        <div class="setting-group" id="groupIdleThreshold">
+          <div class="setting-row-top">
+            <span class="setting-label">Idle timeout threshold</span>
+            <span class="setting-badge" id="badgeIdleThreshold">5 min</span>
+          </div>
+          <div class="slider-track-wrap">
+            <input type="range" class="custom-range" id="sliderIdleThreshold" min="1" max="60" step="1" value="5" oninput="updateSettingsUI()">
+            <div class="slider-limits">
+              <span>1 min</span>
+              <span>60 min</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-divider"></div>
+        <div class="setting-section-title">System & Background</div>
+
+        <div class="setting-toggle-row">
+          <div class="setting-toggle-info">
+            <span class="setting-label">Minimize to System Tray</span>
+            <span class="setting-sublabel">Closing the window hides qPilot to the system tray while continuing to snipe</span>
+          </div>
+          <label class="switch-small">
+            <input type="checkbox" id="checkMinimizeToTray" checked onchange="updateSettingsUI()">
+            <span class="slider-small"></span>
+          </label>
+        </div>
+
+        <p class="setting-explanation">
+          Each queue message gets one burst of clicks at the set rate. Once joined or once the burst duration ends, clicks immediately stop and enforce the cooldown timeout.
+        </p>
+      </div>
+
+      <div class="drawer-footer">
+        <button class="save-settings-btn" onclick="saveSettings()">Save changes</button>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="queueEnteredModal" style="display: none;" onclick="closeQueueModalOnBackdrop(event)">
+      <div class="modal-card queue-entered-card">
+        <div class="queue-celebrate-header">
+          <div class="queue-celebrate-badge">
+            <i class="ph ph-check" style="font-size: 24px; color: #4ade80;"></i>
+          </div>
+          <div style="flex: 1;">
+            <div class="modal-title" style="font-size: 18px; color: #4ade80;">Successfully Entered Queue!</div>
+            <div class="modal-subtitle">You have successfully joined the waitlist queue</div>
+          </div>
+          <button class="modal-close-btn" onclick="closeQueueEnteredModal()"><i class="ph ph-x"></i></button>
+        </div>
+
+        <div class="queue-entered-body">
+          <div class="queue-target-box">
+            <div class="queue-target-left">
+              <div class="queue-target-guild" id="modalQueueGuild">Server Name</div>
+              <div class="queue-target-region" id="modalQueueRegion">Region / Channel</div>
+            </div>
+            <div class="queue-stat-pill" id="modalQueueLatency">Joined in 32 ms</div>
+          </div>
+
+          <div class="queue-cooldown-notice" id="modalCooldownNotice">
+            <div class="notice-icon">⏸️</div>
+            <div class="notice-content">
+              <div class="notice-title">Queue Protection Active</div>
+              <div class="notice-desc">
+                Sniping on other tierlists has been automatically paused for <strong id="modalPauseMinutes">60 minutes</strong> to safeguard your spot.
+              </div>
+              <div class="notice-timer" id="modalResumeCountdown">Resumes in 60m 00s</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="queue-modal-footer">
+          <button class="resume-now-btn" id="modalResumeNowBtn" onclick="resumeSnipingNow()">Resume Other Queues Now</button>
+          <button class="modal-submit-btn" onclick="closeQueueEnteredModal()">Keep Paused & Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="addAccountModal" style="display: none;" onclick="closeModalOnBackdrop(event)">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <div class="modal-badge-icon">
+              <img src="../assets/qpilot-transparent.png" class="modal-brand-icon" alt="qPilot">
+            </div>
+            <div>
+              <div class="modal-title">Add Discord Account</div>
+              <div class="modal-subtitle">Connect another account to snipe waitlists concurrently</div>
+            </div>
+          </div>
+          <button class="modal-close-btn" onclick="closeAddAccountModal()"><i class="ph ph-x"></i></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="login-input-group">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#5865F2" style="flex-shrink: 0; margin-right: 2px;">
+              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+            </svg>
+            <input type="password" id="modalTokenInput" class="modal-token-input" placeholder="Paste Discord user token..." autocomplete="off">
+            <button type="button" class="eye-toggle-btn" onclick="toggleModalTokenVisibility()" title="Show/Hide">
+              <svg id="modalEyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="login-error-text" id="modalErrorMsg"></div>
+
+          <div class="discord-helper-box" style="margin-top: 14px;">
+            <div class="helper-box-title">Get token in Discord desktop console:</div>
+            <div class="helper-keys-row">
+              <span class="kbd-chip">Ctrl</span>
+              <span>+</span>
+              <span class="kbd-chip">Shift</span>
+              <span>+</span>
+              <span class="kbd-chip">I</span>
+              <span>→</span>
+              <span>Console</span>
+              <span>→</span>
+              <span>Paste:</span>
+            </div>
+            <div class="helper-code-container">
+              <div class="helper-code-text" id="modalTokenScript">window.webpackChunkdiscord_app.push([[""],{},e=>{for(let c in e.c)m.push(e.c[c])},m.find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()}])</div>
+              <button type="button" class="copy-snippet-btn" onclick="copyModalTokenScript()" title="Copy snippet">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="modal-cancel-btn" onclick="closeAddAccountModal()">Cancel</button>
+          <button class="modal-submit-btn" id="modalSubmitBtn" onclick="handleAddAccountSubmit()">
+            <span id="modalBtnText">Connect Account</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="addCustomModal" style="display: none;" onclick="closeCustomModalOnBackdrop(event)">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <div class="modal-badge-icon">
+              <i class="ph ph-plus" style="font-size: 20px;"></i>
+            </div>
+            <div>
+              <div class="modal-title">Add Custom Waitlist Channel</div>
+              <div class="modal-subtitle">Snipe any server, waitlist channel, or custom button text</div>
+            </div>
+          </div>
+          <button class="modal-close-btn" onclick="closeAddCustomModal()"><i class="ph ph-x"></i></button>
+        </div>
+
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
+
+          <div class="custom-field-group">
+            <label class="custom-field-label">DISCORD SERVER</label>
+            <select id="customServerSelect" class="custom-modal-select" onchange="onCustomServerChanged(this.value)">
+              <option value="">-- Choose a Server --</option>
+            </select>
+          </div>
+
+          <div class="custom-field-group">
+            <label class="custom-field-label">WAITLIST CHANNEL</label>
+            <select id="customChannelSelect" class="custom-modal-select" onchange="onCustomChannelChanged(this.value)">
+              <option value="">-- Select a Server First --</option>
+            </select>
+          </div>
+
+          <div class="custom-field-group">
+            <label class="custom-field-label">JOIN QUEUE BUTTON TEXT (OPTIONAL)</label>
+            <input type="text" id="customButtonLabelInput" class="custom-modal-input" placeholder="Join Queue (e.g. Enter Queue, Join Waitlist)">
+            <span class="custom-field-hint">Specify the exact button label if the server uses custom text. Defaults to "Join Queue".</span>
+          </div>
+
+          <div class="custom-field-group">
+            <label class="custom-field-label">REGION / TAG (OPTIONAL)</label>
+            <input type="text" id="customRegionInput" class="custom-modal-input" placeholder="e.g. NA, EU, AF, SEA, CUSTOM">
+          </div>
+
+          <div class="login-error-text" id="customModalErrorMsg"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="modal-cancel-btn" onclick="closeAddCustomModal()">Cancel</button>
+          <button class="modal-submit-btn" id="customModalSubmitBtn" onclick="submitAddCustomWaitlist()">
+            <span>Add & Arm Waitlist</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-view" id="loginView" style="display: none;">
+      <div class="login-card">
+
+        <div class="login-left">
+
+          <svg class="radar-bg-art" viewBox="0 0 390 570" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+            <circle cx="340" cy="80" r="150" stroke="#1c2035" stroke-width="1.2" opacity="0.6"/>
+            <circle cx="340" cy="80" r="250" stroke="#161a2c" stroke-width="1" opacity="0.4"/>
+
+            <circle cx="-20" cy="590" r="110" stroke="#191f33" stroke-width="1.2" fill="none"/>
+            <circle cx="-20" cy="590" r="200" stroke="#25325c" stroke-width="1.5" fill="none"/>
+            <circle cx="-20" cy="590" r="300" stroke="#1d2645" stroke-width="1.2" stroke-dasharray="3 3" fill="none"/>
+            <circle cx="-20" cy="590" r="400" stroke="#161d33" stroke-width="1" fill="none"/>
+
+            <circle cx="103" cy="432" r="5" fill="#5865F2"/>
+            <circle cx="103" cy="432" r="12" fill="#5865F2" opacity="0.25"/>
+            <circle cx="103" cy="432" r="22" fill="#5865F2" opacity="0.1"/>
+          </svg>
+
+          <div class="login-left-content">
+            <div>
+              <div class="login-brand-hero">
+                <img src="../assets/qPilot-app-textlogo.png" class="login-long-logo" alt="qPilot">
+              </div>
+              <p class="login-app-desc">Automatically monitor Discord sessions and snipe MCTiers and PvPTiers queues.</p>
+            </div>
+
+            <div class="login-features-list">
+              <div class="feature-item">
+                <div class="feature-icon-box">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="feature-title">Real-time monitoring</div>
+                  <div class="feature-desc">Tracks queues as soon as they appear.</div>
+                </div>
+              </div>
+
+              <div class="feature-item">
+                <div class="feature-icon-box">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <circle cx="12" cy="12" r="7"/>
+                    <line x1="12" y1="1" x2="12" y2="5"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="1" y1="12" x2="5" y2="12"/>
+                    <line x1="19" y1="12" x2="23" y2="12"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="feature-title">Instant sniping</div>
+                  <div class="feature-desc">Automatically joins for you.</div>
+                </div>
+              </div>
+
+              <div class="feature-item">
+                <div class="feature-icon-box">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="feature-title">Secure & local</div>
+                  <div class="feature-desc">Your token never leaves your device.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="login-right">
+          <div class="login-category-tag">GET STARTED</div>
+          <h1 class="login-heading">Connect your Discord</h1>
+          <p class="login-subheading">Paste your Discord user token to automatically monitor and snipe MCTiers and PvPTiers queues.</p>
+
+          <label class="login-input-label">DISCORD ACCOUNT TOKEN</label>
+          <div class="token-input-wrapper">
+            <div class="token-input-key-icon" title="Discord Account">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#5865F2">
+                <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+              </svg>
+            </div>
+            <input type="password" id="discordTokenInput" class="token-input-real" placeholder="Paste user token here..." autocomplete="off" spellcheck="false" />
+            <button type="button" class="token-eye-btn" onclick="toggleTokenVisibility()" title="Toggle visibility">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eyeIcon">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="login-error-text" id="loginErrorMsg">Invalid token. Please check and try again.</div>
+
+          <button class="login-connect-btn" id="loginSubmitBtn" onclick="handleLogin()">
+            <span id="loginBtnText">Connect</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+
+          <div class="login-divider-row">
+            <div class="login-divider-line"></div>
+            <div class="login-divider-text">OR</div>
+            <div class="login-divider-line"></div>
+          </div>
+
+          <div class="discord-helper-box">
+            <div class="helper-box-title">Get token in Discord (desktop):</div>
+            <div class="helper-keys-row">
+              <span class="kbd-chip">Ctrl</span>
+              <span class="arrow-chip">+</span>
+              <span class="kbd-chip">Shift</span>
+              <span class="arrow-chip">+</span>
+              <span class="kbd-chip">I</span>
+              <span class="arrow-chip">→</span>
+              <span class="helper-action-text">Console</span>
+              <span class="arrow-chip">→</span>
+              <span class="helper-action-text">Paste:</span>
+            </div>
+
+            <div class="helper-code-container">
+              <div class="helper-code-text" id="discordTokenScript">window.webpackChunkdiscord_app.push([[""],{},e=>{for(let c in e.c)m.push(e.c[c])},m.find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()}])</div>
+              <div class="copy-feedback-tooltip" id="copyTooltip">Copied!</div>
+              <button type="button" class="copy-snippet-btn" onclick="copyTokenScript()" title="Copy snippet">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+
+    const state = {
+      accounts: new Map(),
+      activeAccountId: null,
+      snipeAllAccounts: true,
+      searchQuery: '',
+      settings: {
+        cps: 100,
+        burstLength: 3.0,
+        cooldown: 60,
+        pauseAfterJoin: true,
+        pauseDurationMinutes: 60,
+        pauseOnIdle: true,
+        idleThresholdMinutes: 5,
+      },
+      queuePauseUntil: 0,
+      isIdlePaused: false,
+      collapsedCards: new Set(),
+      joinedStatuses: new Map(),
+      isScanning: false,
+    };
+
+    function getActiveAccount() {
+      if (state.activeAccountId && state.accounts.has(state.activeAccountId)) {
+        return state.accounts.get(state.activeAccountId);
+      }
+      if (state.accounts.size > 0) {
+        return state.accounts.values().next().value;
+      }
+      return null;
+    }
+
+    function getTotalArmedCount() {
+      if (state.snipeAllAccounts) {
+        const unique = new Set();
+        for (const acc of state.accounts.values()) {
+          for (const chId of acc.armedChannels.keys()) {
+            unique.add(chId);
+          }
+        }
+        return unique.size;
+      } else {
+        const active = getActiveAccount();
+        return active ? active.armedChannels.size : 0;
+      }
+    }
+
+    try {
+      const savedSettings = localStorage.getItem('qpilot_settings');
+      if (savedSettings) {
+        state.settings = Object.assign(state.settings, JSON.parse(savedSettings));
+      }
+      const savedSnipeAll = localStorage.getItem('qpilot_snipe_all');
+      if (savedSnipeAll !== null) {
+        state.snipeAllAccounts = savedSnipeAll === 'true';
+        const chk = document.getElementById('snipeAllAccountsCheck');
+        if (chk) chk.checked = state.snipeAllAccounts;
+      }
+    } catch (e) {}
+
+    document.getElementById('sliderCps').value = state.settings.cps;
+    document.getElementById('sliderBurst').value = state.settings.burstLength;
+    document.getElementById('sliderCooldown').value = state.settings.cooldown;
+    if (document.getElementById('checkPauseAfterJoin')) {
+      document.getElementById('checkPauseAfterJoin').checked = state.settings.pauseAfterJoin !== false;
+    }
+    if (document.getElementById('sliderPauseDuration')) {
+      document.getElementById('sliderPauseDuration').value = state.settings.pauseDurationMinutes || 60;
+    }
+    if (document.getElementById('checkPauseOnIdle')) {
+      document.getElementById('checkPauseOnIdle').checked = state.settings.pauseOnIdle !== false;
+    }
+    if (document.getElementById('sliderIdleThreshold')) {
+      document.getElementById('sliderIdleThreshold').value = state.settings.idleThresholdMinutes || 5;
+    }
+    if (document.getElementById('checkMinimizeToTray')) {
+      document.getElementById('checkMinimizeToTray').checked = state.settings.minimizeToTray !== false;
+    }
+    updateSettingsUI();
+    if (window.api && window.api.updateSettings) {
+      window.api.updateSettings(state.settings);
+    }
+
+    async function saveAccountsToStorage() {
+      try {
+        const serialized = [];
+        for (const [id, acc] of state.accounts) {
+
+          if (acc.token && acc.token.trim().length > 10) {
+            serialized.push({
+              id: acc.id,
+              token: acc.token.trim(),
+              user: acc.user || null,
+            });
+          }
+        }
+
+        if (window.api && window.api.storeSet) {
+          await window.api.storeSet('accounts', serialized);
+          if (state.activeAccountId) {
+            await window.api.storeSet('activeAccountId', state.activeAccountId);
+          }
+          await window.api.storeSet('snipeAllAccounts', state.snipeAllAccounts);
+        }
+
+        localStorage.setItem('qpilot_accounts', JSON.stringify(serialized));
+        if (state.activeAccountId) {
+          localStorage.setItem('qpilot_active_acc', state.activeAccountId);
+        }
+        localStorage.setItem('qpilot_snipe_all', state.snipeAllAccounts ? 'true' : 'false');
+      } catch (e) {
+        console.error('Failed to save accounts to storage:', e);
+      }
+    }
+
+    async function loadAccountsFromStorage() {
+      try {
+        let list = null;
+
+        if (window.api && window.api.storeGet) {
+          try {
+            list = await window.api.storeGet('accounts');
+          } catch (e) {
+            console.warn('[Storage] Failed to read storeGet accounts:', e);
+          }
+        }
+
+        if (!list || !Array.isArray(list) || list.length === 0) {
+          const raw = localStorage.getItem('qpilot_accounts');
+          if (raw) {
+            try {
+              list = JSON.parse(raw);
+            } catch (e) {}
+          }
+        }
+
+        if (!list || !Array.isArray(list) || list.length === 0) {
+          let legacyToken = null;
+          if (window.api && window.api.storeGet) {
+            try {
+              legacyToken = await window.api.storeGet('legacyToken');
+            } catch (e) {}
+          }
+          if (!legacyToken) {
+            legacyToken = localStorage.getItem('qpilot_token');
+          }
+          if (legacyToken && legacyToken.trim().length > 20) {
+            const tempId = `acc_${Date.now()}`;
+            list = [{
+              id: tempId,
+              token: legacyToken.trim(),
+              user: null,
+            }];
+          }
+        }
+
+        if (Array.isArray(list) && list.length > 0) {
+          state.accounts.clear();
+          for (const item of list) {
+            if (item && item.token && item.token.trim().length > 10) {
+              state.accounts.set(item.id, {
+                id: item.id,
+                token: item.token.trim(),
+                user: item.user || null,
+                servers: [],
+                armedChannels: new Map(),
+                status: 'connecting',
+              });
+            }
+          }
+
+          if (state.accounts.size > 0) {
+            let savedActive = null;
+            if (window.api && window.api.storeGet) {
+              try {
+                savedActive = await window.api.storeGet('activeAccountId');
+              } catch (e) {}
+            }
+            if (!savedActive) {
+              savedActive = localStorage.getItem('qpilot_active_acc');
+            }
+
+            if (savedActive && state.accounts.has(savedActive)) {
+              state.activeAccountId = savedActive;
+            } else {
+              state.activeAccountId = state.accounts.keys().next().value;
+            }
+
+            let savedSnipeAll = null;
+            if (window.api && window.api.storeGet) {
+              try {
+                savedSnipeAll = await window.api.storeGet('snipeAllAccounts');
+              } catch (e) {}
+            }
+            if (savedSnipeAll !== null && savedSnipeAll !== undefined) {
+              state.snipeAllAccounts = !!savedSnipeAll;
+            } else {
+              state.snipeAllAccounts = localStorage.getItem('qpilot_snipe_all') === 'true';
+            }
+            const toggle = document.getElementById('snipeAllAccountsCheck');
+            if (toggle) toggle.checked = state.snipeAllAccounts;
+
+            return true;
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load accounts from storage:', e);
+      }
+      return false;
+    }
+
+    window.api.onReady(async (data) => {
+      const accountId = data.accountId || data.id;
+      const tempId = data.tempId;
+      const user = data.user || data;
+
+      let acc = null;
+      let matchedKey = null;
+
+      if (accountId && state.accounts.has(accountId)) {
+        acc = state.accounts.get(accountId);
+        matchedKey = accountId;
+      } else if (tempId && state.accounts.has(tempId)) {
+        acc = state.accounts.get(tempId);
+        matchedKey = tempId;
+      } else if (user && user.id && state.accounts.has(user.id)) {
+        acc = state.accounts.get(user.id);
+        matchedKey = user.id;
+      } else {
+        for (const [id, a] of state.accounts) {
+          if (a.user && a.user.id === user.id) {
+            acc = a;
+            matchedKey = id;
+            break;
+          }
+        }
+        if (!acc) {
+          for (const [id, a] of state.accounts) {
+            if (a.status === 'connecting' && (!a.user || !a.user.id)) {
+              acc = a;
+              matchedKey = id;
+              break;
+            }
+          }
+        }
+      }
+
+      const finalId = (user && user.id) || accountId;
+
+      if (acc) {
+        if (matchedKey && matchedKey !== finalId) {
+          state.accounts.delete(matchedKey);
+        }
+        acc.id = finalId;
+        acc.user = user;
+        acc.status = 'connected';
+        state.accounts.set(finalId, acc);
+      } else {
+        acc = {
+          id: finalId,
+          token: '',
+          user,
+          servers: [],
+          armedChannels: new Map(),
+          status: 'connected',
+        };
+        state.accounts.set(finalId, acc);
+      }
+
+      if (!state.activeAccountId || !state.accounts.has(state.activeAccountId) || state.activeAccountId === matchedKey) {
+        state.activeAccountId = finalId;
+      }
+
+      await saveAccountsToStorage();
+      updateHeaderAccountUI();
+      renderAccountsDropdown();
+
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'flex';
+      const name = user.globalName || user.username;
+      logTimelineEvent('Connected to Discord', `Logged in as ${name}`, false, name, 'blue');
+    });
+
+    window.api.onScanning((data) => {
+      const isScanning = typeof data === 'boolean' ? data : (data.isScanning ?? true);
+      state.isScanning = isScanning;
+      document.getElementById('scanningBanner').style.display = isScanning ? 'flex' : 'none';
+
+      const active = getActiveAccount();
+      if (isScanning && (!active || !active.servers || active.servers.length === 0)) {
+        renderSkeletonCards();
+      }
+    });
+
+    window.api.onServers((data) => {
+      const accountId = data.accountId;
+      const servers = data.servers || (Array.isArray(data) ? data : []);
+
+      let acc = accountId ? state.accounts.get(accountId) : getActiveAccount();
+      if (acc) {
+        acc.servers = servers;
+        acc.status = 'connected';
+      }
+
+      document.getElementById('scanningBanner').style.display = 'none';
+
+      if (!acc || acc.id === state.activeAccountId || state.accounts.size === 1) {
+        renderServers();
+      }
+
+      const accName = acc?.user ? (acc.user.globalName || acc.user.username) : null;
+      if (!servers || servers.length === 0) {
+        logTimelineEvent('No Tierlist servers found', 'No accessible waitlist channels', false, accName, 'red');
+      } else {
+        logTimelineEvent(`Found ${servers.length} Tierlist servers`, 'Scanning completed', false, accName, 'blue');
+      }
+      renderAccountsDropdown();
+    });
+
+    window.api.onChannelArmed((data) => {
+      const { accountId, channelId, armed, guildName, channelName, region } = data;
+      const acc = accountId ? state.accounts.get(accountId) : getActiveAccount();
+      if (acc) {
+        if (armed) {
+          acc.armedChannels.set(channelId, { guildName, channelName, region });
+        } else {
+          acc.armedChannels.delete(channelId);
+        }
+      }
+      updateArmedBadge();
+      renderAccountsDropdown();
+    });
+
+    window.api.onBurstStart((data) => {
+      const accName = data.user ? (data.user.globalName || data.user.username) : null;
+      logTimelineEvent(`Queue open, clicking ${data.cps}/s`, `Bursting for up to ${data.burstLength}s`, false, accName, 'blue');
+    });
+
+    window.api.onQueueJoined((data) => {
+      state.joinedStatuses.set(data.channelId, data.latencyMs);
+      const accName = data.user ? (data.user.globalName || data.user.username) : 'Account';
+
+      let guildName = 'Queue';
+      let region = 'Waitlist';
+      let channelName = '';
+      for (const acc of state.accounts.values()) {
+        if (acc.armedChannels && acc.armedChannels.has(data.channelId)) {
+          const ch = acc.armedChannels.get(data.channelId);
+          guildName = ch.guildName || guildName;
+          region = ch.region || region;
+          channelName = ch.channelName || channelName;
+          break;
+        }
+        if (acc.servers) {
+          for (const s of acc.servers) {
+            const foundCh = s.waitlistChannels?.find(c => c.id === data.channelId);
+            if (foundCh) {
+              guildName = s.name;
+              region = foundCh.region;
+              channelName = foundCh.name;
+              break;
+            }
+          }
+        }
+      }
+
+      const targetName = `${guildName} ${region}`;
+      logTimelineEvent(`Joined ${targetName}`, `Latency: ${data.latencyMs} ms (${data.clicks} clicks)`, true, accName, 'green');
+
+      const badge = document.getElementById(`statusBadge_${data.channelId}`);
+      if (badge) {
+        const textSpan = badge.querySelector('.latency-text');
+        if (textSpan) textSpan.textContent = `Joined in ${data.latencyMs} ms`;
+        badge.classList.add('show');
+      }
+
+      triggerQueueJoinedPrompt({
+        guildName,
+        region,
+        channelName,
+        latencyMs: data.latencyMs,
+        clicks: data.clicks,
+        user: data.user,
+      });
+    });
+
+    window.api.onError((data) => {
+      const err = data.error || (typeof data === 'string' ? data : JSON.stringify(data));
+      const acc = data.accountId ? state.accounts.get(data.accountId) : null;
+      const accName = acc?.user ? (acc.user.globalName || acc.user.username) : null;
+      logTimelineEvent('Error', err, false, accName, 'red');
+    });
+
+    window.api.onDisconnected((data) => {
+      const acc = data.accountId ? state.accounts.get(data.accountId) : null;
+      if (acc) acc.status = 'disconnected';
+      const accName = acc?.user ? (acc.user.globalName || acc.user.username) : null;
+      logTimelineEvent('Disconnected from Discord gateway', 'Connection lost', false, accName, 'red');
+      renderAccountsDropdown();
+    });
+
+    if (window.api.onIdleStatus) {
+      window.api.onIdleStatus((data) => {
+        state.isIdlePaused = !!data.isIdle;
+        const pill = document.getElementById('idlePausedPill');
+        if (pill) {
+          pill.style.display = state.isIdlePaused ? 'inline-flex' : 'none';
+        }
+        if (state.isIdlePaused) {
+          logTimelineEvent('Sniping paused (PC Idle)', `Inactivity threshold reached (${state.settings.idleThresholdMinutes || 5}m)`, false, null, 'purple');
+        } else {
+          logTimelineEvent('Sniping resumed', 'User input detected', false, null, 'green');
+        }
+      });
+    }
+
+    function renderServers() {
+      const container = document.getElementById('waitlistsContainer');
+      container.innerHTML = '';
+
+      const active = getActiveAccount();
+      const rawServers = active ? (active.servers || []) : [];
+
+      const query = (state.searchQuery || '').toLowerCase();
+      const servers = rawServers.filter((s) => {
+        if (!s.waitlistChannels || s.waitlistChannels.length === 0) return false;
+        if (!query) return true;
+        const matchesName = (s.name || '').toLowerCase().includes(query);
+        const matchesChannel = s.waitlistChannels.some(
+          ch => (ch.region || '').toLowerCase().includes(query) || (ch.name || '').toLowerCase().includes(query)
+        );
+        return matchesName || matchesChannel;
+      });
+
+      if (servers.length === 0) {
+        if (rawServers.length === 0) {
+          document.getElementById('dashboardView').style.display = 'none';
+          document.getElementById('emptyStateView').style.display = 'flex';
+        } else {
+          container.innerHTML = `<div style="padding: 40px; text-align: center; color: #6e6e7e;">No servers match "${escapeHtml(state.searchQuery)}"</div>`;
+        }
+        return;
+      }
+
+      document.getElementById('emptyStateView').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'flex';
+
+      servers.forEach((server) => {
+        const isCollapsed = state.collapsedCards.has(server.id);
+        const card = document.createElement('div');
+        card.className = `server-card ${isCollapsed ? 'collapsed' : ''}`;
+        card.setAttribute('data-id', server.id);
+
+        let iconSvg = getCategoryIconSvg(server.name);
+        if (server.icon) {
+          iconSvg = `<img src="${server.icon}" alt="${server.name}">`;
+        }
+
+        const countText = `${server.waitlistChannels.length} waitlist queue${server.waitlistChannels.length === 1 ? '' : 's'}`;
+
+        let channelsHtml = '';
+        server.waitlistChannels.forEach((ch) => {
+          let isArmed = false;
+          if (state.snipeAllAccounts) {
+            for (const acc of state.accounts.values()) {
+              if (acc.armedChannels.has(ch.id)) {
+                isArmed = true;
+                break;
+              }
+            }
+          } else {
+            isArmed = active?.armedChannels?.has(ch.id) ?? false;
+          }
+
+          const joinedLatency = state.joinedStatuses.get(ch.id);
+
+          channelsHtml += `
+            <div class="channel-row">
+              <div class="channel-left">
+                <div class="channel-globe-icon ${isArmed ? 'armed' : ''}">
+                  <i class="ph ph-globe" style="font-size: 16px;"></i>
+                </div>
+                <div class="channel-name-wrap">
+                  <div class="channel-region-title">
+                    ${ch.region}
+                    ${ch.isCustom ? '<span style="font-size: 10px; color: #a5b4fc; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); padding: 1px 6px; border-radius: 4px; margin-left: 6px;">Custom</span>' : ''}
+                  </div>
+                  <div class="channel-hash-subname">
+                    # ${ch.name}
+                    ${ch.customButtonText ? `<span style="color: #6366f1; margin-left: 6px; font-size: 11px;">[Button: "${escapeHtml(ch.customButtonText)}"]</span>` : ''}
+                  </div>
+                </div>
+              </div>
+
+              <div class="channel-right">
+                <div class="joined-status-badge ${joinedLatency ? 'show' : ''}" id="statusBadge_${ch.id}">
+                  <span class="latency-text">Joined in ${joinedLatency || 38} ms</span>
+                </div>
+
+                <div class="toggle-switch-container">
+                  <div class="modern-switch ${isArmed ? 'armed' : ''}" data-channel-id="${ch.id}" onclick="event.stopPropagation(); toggleChannel('${ch.id}', '${escapeQuotes(server.name)}', '${ch.name}', '${ch.region}', this)">
+                    <div class="switch-knob"></div>
+                  </div>
+                  <span class="switch-state-label">${isArmed ? 'Armed' : 'Idle'}</span>
+                </div>
+
+                ${ch.isCustom ? `
+                  <button class="remove-account-btn" onclick="removeCustomWaitlist('${ch.id}', event)" title="Remove custom waitlist" style="margin-left: 4px;">
+                    <i class="ph ph-x" style="font-size: 12px;"></i>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        });
+
+        card.innerHTML = `
+          <div class="server-card-header" onclick="toggleCardCollapse('${server.id}', this)">
+            <div class="server-header-left">
+              <div class="server-icon-badge">${iconSvg}</div>
+              <div>
+                <div class="server-title-text">${server.name}</div>
+                <div class="server-sub-row">
+                  <span class="server-queue-count">${countText}</span>
+                </div>
+              </div>
+            </div>
+            <div class="chevron-icon">
+              <i class="ph ph-caret-up" style="font-size: 16px;"></i>
+            </div>
+          </div>
+          <div class="server-channels-list">
+            ${channelsHtml}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      updateArmedBadge();
+    }
+
+    function renderSkeletonCards() {
+      const container = document.getElementById('waitlistsContainer');
+      container.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          ${[1, 2, 3].map(() => `
+            <div class="server-card" style="padding: 16px 20px;">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 40px; height: 40px; border-radius: 11px; background: #181822;"></div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <div style="width: 180px; height: 14px; background: #1e1e28; border-radius: 4px;"></div>
+                  <div style="width: 100px; height: 10px; background: #181822; border-radius: 4px;"></div>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function getCategoryIconSvg(name) {
+      const lower = (name || '').toLowerCase();
+      if (lower.includes('sword') || lower.includes('pvp') || lower.includes('pot')) {
+        return `<i class="ph ph-sword" style="font-size: 20px; color: #a5b4fc;"></i>`;
+      }
+      if (lower.includes('crystal') || lower.includes('tier')) {
+        return `<i class="ph ph-trophy" style="font-size: 20px; color: #fcd34d;"></i>`;
+      }
+      return `<i class="ph ph-game-controller" style="font-size: 20px; color: #c4b5fd;"></i>`;
+    }
+
+    function toggleCardCollapse(serverId, headerEl) {
+      const card = headerEl ? headerEl.closest('.server-card') : document.querySelector(`.server-card[data-id="${serverId}"]`);
+      if (!card) return;
+
+      const isNowCollapsed = card.classList.toggle('collapsed');
+      if (isNowCollapsed) {
+        state.collapsedCards.add(serverId);
+      } else {
+        state.collapsedCards.delete(serverId);
+      }
+    }
+
+    function handleServerSearch(query) {
+      state.searchQuery = query || '';
+      renderServers();
+    }
+
+    async function toggleChannel(channelId, guildName, channelName, region, toggleEl) {
+      const active = getActiveAccount();
+
+      let wasArmed = false;
+      if (state.snipeAllAccounts) {
+        for (const acc of state.accounts.values()) {
+          if (acc.armedChannels.has(channelId)) {
+            wasArmed = true;
+            break;
+          }
+        }
+      } else {
+        wasArmed = active?.armedChannels?.has(channelId) ?? false;
+      }
+
+      const labelEl = toggleEl?.parentElement?.querySelector('.switch-state-label');
+      const row = toggleEl?.closest('.channel-row');
+
+      if (wasArmed) {
+        if (state.snipeAllAccounts) {
+          for (const acc of state.accounts.values()) {
+            acc.armedChannels.delete(channelId);
+          }
+          await window.api.disarmChannel({ channelId });
+          logTimelineEvent(`Disarmed ${guildName} ${region}`, 'Multi-account disarmed', false, null, 'blue');
+        } else if (active) {
+          active.armedChannels.delete(channelId);
+          await window.api.disarmChannel({ accountId: active.id, channelId });
+          const name = active.user?.globalName || active.user?.username;
+          logTimelineEvent(`Disarmed ${guildName} ${region}`, 'Channel disarmed', false, name, 'blue');
+        }
+
+        if (toggleEl) toggleEl.classList.remove('armed');
+        if (labelEl) labelEl.textContent = 'Idle';
+        if (row) row.querySelector('.channel-globe-icon')?.classList.remove('armed');
+      } else {
+        if (state.snipeAllAccounts) {
+          for (const acc of state.accounts.values()) {
+            acc.armedChannels.set(channelId, { guildName, channelName, region });
+          }
+          await window.api.armChannel({ channelId, guildName, channelName, region });
+          logTimelineEvent(`Armed ${guildName} ${region}`, 'Multi-account armed', false, null, 'blue');
+        } else if (active) {
+          active.armedChannels.set(channelId, { guildName, channelName, region });
+          await window.api.armChannel({ accountId: active.id, channelId, guildName, channelName, region });
+          const name = active.user?.globalName || active.user?.username;
+          logTimelineEvent(`Armed ${guildName} ${region}`, 'Queue armed for snipe', false, name, 'blue');
+        }
+
+        if (toggleEl) toggleEl.classList.add('armed');
+        if (labelEl) labelEl.textContent = 'Armed';
+        if (row) row.querySelector('.channel-globe-icon')?.classList.add('armed');
+      }
+
+      updateArmedBadge();
+      renderAccountsDropdown();
+    }
+
+    function updateArmedBadge() {
+      const count = getTotalArmedCount();
+      const badge = document.getElementById('armedBadge');
+      const text = document.getElementById('armedBadgeText');
+
+      text.textContent = `${count} armed`;
+      if (count > 0) {
+        badge.classList.add('active');
+      } else {
+        badge.classList.remove('active');
+      }
+    }
+
+    function selectNavTab(tab) {
+      document.getElementById('tabWaitlists').classList.toggle('active', tab === 'waitlists');
+      document.getElementById('tabSettings').classList.toggle('active', tab === 'settings');
+
+      if (tab === 'settings') {
+        toggleSettingsDrawer(true);
+      } else {
+        toggleSettingsDrawer(false);
+      }
+    }
+
+    function updateHeaderAccountUI() {
+      const active = getActiveAccount();
+      const nameEl = document.getElementById('accountName');
+      const avatarEl = document.getElementById('userAvatarImg');
+
+      if (!active || !active.user) {
+        nameEl.textContent = 'Account';
+        avatarEl.src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+        return;
+      }
+
+      nameEl.textContent = active.user.globalName || active.user.username;
+      if (active.user.avatar) {
+        avatarEl.src = `https://cdn.discordapp.com/avatars/${active.user.id}/${active.user.avatar}.png?size=40`;
+      }
+    }
+
+    function renderAccountsDropdown() {
+      const listEl = document.getElementById('accountsList');
+      if (!listEl) return;
+      listEl.innerHTML = '';
+
+      const count = state.accounts.size;
+      const subtitleEl = document.getElementById('accountsSubtitle');
+      if (subtitleEl) {
+        subtitleEl.textContent = `${count} connected • ${getTotalArmedCount()} armed`;
+      }
+
+      state.accounts.forEach((acc) => {
+        const isActive = acc.id === state.activeAccountId;
+        const displayName = acc.user?.globalName || acc.user?.username || 'Discord User';
+        const username = acc.user?.username || 'connecting...';
+        const armedCount = acc.armedChannels.size;
+        const avatarSrc = acc.user?.avatar
+          ? `https://cdn.discordapp.com/avatars/${acc.user.id}/${acc.user.avatar}.png?size=40`
+          : 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+        const row = document.createElement('div');
+        row.className = `account-item ${isActive ? 'active' : ''}`;
+        row.onclick = () => switchAccount(acc.id);
+
+        row.innerHTML = `
+          <div class="account-item-left">
+            <div class="account-avatar-wrap">
+              <img src="${avatarSrc}" class="account-avatar-img" alt="${displayName}">
+              <div class="account-status-dot ${acc.status === 'connected' ? 'online' : ''}"></div>
+            </div>
+            <div class="account-info">
+              <div class="account-display-name">${escapeHtml(displayName)}</div>
+              <div class="account-subtext">@${escapeHtml(username)} • ${armedCount} armed</div>
+            </div>
+          </div>
+          <div class="account-item-right">
+            ${isActive ? `<span class="active-badge">Active</span>` : `<button class="switch-btn">Switch</button>`}
+            <button class="remove-account-btn" onclick="event.stopPropagation(); removeAccount('${acc.id}')" title="Disconnect account">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </button>
+          </div>
+        `;
+        listEl.appendChild(row);
+      });
+    }
+
+    function toggleAccountDropdown(e) {
+      if (e) e.stopPropagation();
+      const dropdown = document.getElementById('accountDropdown');
+      const pill = document.getElementById('userPill');
+      const isOpen = dropdown.classList.toggle('show');
+      pill.classList.toggle('open', isOpen);
+      if (isOpen) {
+        renderAccountsDropdown();
+      }
+    }
+
+    function switchAccount(accountId) {
+      if (state.activeAccountId === accountId) {
+        closeAccountDropdown();
+        return;
+      }
+
+      state.activeAccountId = accountId;
+      saveAccountsToStorage();
+      updateHeaderAccountUI();
+      renderAccountsDropdown();
+      renderServers();
+      closeAccountDropdown();
+
+      const acc = state.accounts.get(accountId);
+      const name = acc?.user ? (acc.user.globalName || acc.user.username) : 'Account';
+      logTimelineEvent(`Switched active view to ${name}`, 'Account switched', false, null, 'blue');
+    }
+
+    function closeAccountDropdown() {
+      document.getElementById('accountDropdown')?.classList.remove('show');
+      document.getElementById('userPill')?.classList.remove('open');
+    }
+
+    function toggleSnipeAll(checked) {
+      state.snipeAllAccounts = checked;
+      saveAccountsToStorage();
+      renderServers();
+      logTimelineEvent(`Multi-account sniping: ${checked ? 'All accounts armed' : 'Single account'}`, '', false, null, 'blue');
+    }
+
+    async function removeAccount(accountId) {
+      const acc = state.accounts.get(accountId);
+      const name = acc?.user ? (acc.user.globalName || acc.user.username) : 'Account';
+
+      await window.api.disconnect({ accountId });
+      state.accounts.delete(accountId);
+
+      if (state.activeAccountId === accountId) {
+        const next = state.accounts.keys().next().value;
+        state.activeAccountId = next || null;
+      }
+
+      saveAccountsToStorage();
+      updateHeaderAccountUI();
+      renderAccountsDropdown();
+      logTimelineEvent(`Removed ${name}`, 'Removed account from queue', false, null, 'red');
+
+      if (state.accounts.size === 0) {
+        signOutAll();
+      } else {
+        renderServers();
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('accountDropdown');
+      const pill = document.getElementById('userPill');
+      if (dropdown && dropdown.classList.contains('show')) {
+        if (!dropdown.contains(e.target) && !pill.contains(e.target)) {
+          closeAccountDropdown();
+        }
+      }
+    });
+
+    function openAddAccountModal(e) {
+      if (e) e.stopPropagation();
+      closeAccountDropdown();
+      document.getElementById('modalTokenInput').value = '';
+      document.getElementById('modalErrorMsg').style.display = 'none';
+      document.getElementById('modalSubmitBtn').disabled = false;
+      document.getElementById('modalBtnText').textContent = 'Connect Account';
+      document.getElementById('addAccountModal').style.display = 'flex';
+      setTimeout(() => document.getElementById('modalTokenInput').focus(), 50);
+    }
+
+    function closeAddAccountModal() {
+      document.getElementById('addAccountModal').style.display = 'none';
+    }
+
+    function closeModalOnBackdrop(e) {
+      if (e.target.id === 'addAccountModal') {
+        closeAddAccountModal();
+      }
+    }
+
+    function toggleModalTokenVisibility() {
+      const input = document.getElementById('modalTokenInput');
+      const eyeIcon = document.getElementById('modalEyeIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        eyeIcon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+      } else {
+        input.type = 'password';
+        eyeIcon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+      }
+    }
+
+    function copyModalTokenScript() {
+      const code = document.getElementById('modalTokenScript').innerText;
+      navigator.clipboard.writeText(code);
+      logTimelineEvent('Copied snippet', 'Extraction script copied to clipboard', false, null, 'blue');
+    }
+
+    async function handleAddAccountSubmit() {
+      const token = document.getElementById('modalTokenInput').value.trim();
+      const errEl = document.getElementById('modalErrorMsg');
+      const btn = document.getElementById('modalSubmitBtn');
+      const btnText = document.getElementById('modalBtnText');
+
+      if (!token) {
+        errEl.textContent = 'Please enter a Discord token.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      for (const acc of state.accounts.values()) {
+        if (acc.token === token) {
+          errEl.textContent = 'This account is already connected.';
+          errEl.style.display = 'block';
+          return;
+        }
+      }
+
+      errEl.style.display = 'none';
+      btn.disabled = true;
+      btnText.textContent = 'Connecting...';
+
+      const tempId = `acc_${Date.now()}`;
+      state.accounts.set(tempId, {
+        id: tempId,
+        token,
+        user: null,
+        servers: [],
+        armedChannels: new Map(),
+        status: 'connecting',
+      });
+
+      const result = await window.api.connect({
+        token,
+        settings: state.settings,
+        accountId: tempId,
+      });
+
+      if (!result.success) {
+        state.accounts.delete(tempId);
+        await saveAccountsToStorage();
+        errEl.textContent = result.error || 'Failed to connect. Check token.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btnText.textContent = 'Connect Account';
+        return;
+      }
+
+      const finalId = result.accountId || (result.user && result.user.id) || tempId;
+      let acc = state.accounts.get(tempId) || state.accounts.get(finalId);
+      if (state.accounts.has(tempId) && finalId !== tempId) {
+        state.accounts.delete(tempId);
+      }
+
+      if (!acc) {
+        acc = {
+          id: finalId,
+          token,
+          user: result.user,
+          servers: [],
+          armedChannels: new Map(),
+          status: 'connected',
+        };
+      } else {
+        acc.id = finalId;
+        acc.token = token;
+        acc.user = result.user || acc.user;
+        acc.status = 'connected';
+      }
+
+      state.accounts.set(finalId, acc);
+      state.activeAccountId = finalId;
+
+      await saveAccountsToStorage();
+      updateHeaderAccountUI();
+      renderAccountsDropdown();
+      closeAddAccountModal();
+
+      document.getElementById('loginView').style.display = 'none';
+      const name = result.user?.globalName || result.user?.username || 'New Account';
+      logTimelineEvent(`Added and connected ${name}`, 'Account added', false, null, 'green');
+    }
+
+    async function openAddCustomModal() {
+      const modal = document.getElementById('addCustomModal');
+      const serverSelect = document.getElementById('customServerSelect');
+      const channelSelect = document.getElementById('customChannelSelect');
+      const errorMsg = document.getElementById('customModalErrorMsg');
+      const btn = document.getElementById('customModalSubmitBtn');
+
+      if (errorMsg) errorMsg.style.display = 'none';
+      if (btn) btn.disabled = false;
+
+      serverSelect.innerHTML = '<option value="">Loading servers...</option>';
+      channelSelect.innerHTML = '<option value="">-- Select a Server First --</option>';
+
+      modal.style.display = 'flex';
+
+      try {
+        const active = getActiveAccount();
+        const guilds = await window.api.getGuildsAndChannels({ accountId: active?.id });
+        state.browseGuilds = Array.isArray(guilds) ? guilds : [];
+
+        if (state.browseGuilds.length === 0) {
+          serverSelect.innerHTML = '<option value="">No servers found (check Discord connection)</option>';
+          return;
+        }
+
+        serverSelect.innerHTML = `<option value="">-- Choose a Server (${state.browseGuilds.length} available) --</option>`;
+        state.browseGuilds.forEach(g => {
+          const opt = document.createElement('option');
+          opt.value = g.id;
+          opt.textContent = g.name;
+          serverSelect.appendChild(opt);
+        });
+      } catch (err) {
+        console.error('Failed to load guilds for custom modal:', err);
+        serverSelect.innerHTML = '<option value="">Failed to load servers</option>';
+      }
+    }
+
+    function closeAddCustomModal() {
+      const modal = document.getElementById('addCustomModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function closeCustomModalOnBackdrop(e) {
+      if (e.target && e.target.id === 'addCustomModal') {
+        closeAddCustomModal();
+      }
+    }
+
+    function onCustomServerChanged(guildId) {
+      const channelSelect = document.getElementById('customChannelSelect');
+      channelSelect.innerHTML = '<option value="">-- Select a Waitlist Channel --</option>';
+
+      if (!guildId) {
+        channelSelect.innerHTML = '<option value="">-- Select a Server First --</option>';
+        return;
+      }
+
+      const guild = (state.browseGuilds || []).find(g => g.id === guildId);
+      if (!guild || !guild.channels || guild.channels.length === 0) {
+        channelSelect.innerHTML = '<option value="">No text channels found</option>';
+        return;
+      }
+
+      const sortedChannels = [...guild.channels].sort((a, b) => {
+        const aWait = (a.name || '').toLowerCase().includes('waitlist') || (a.name || '').toLowerCase().includes('queue');
+        const bWait = (b.name || '').toLowerCase().includes('waitlist') || (b.name || '').toLowerCase().includes('queue');
+        if (aWait && !bWait) return -1;
+        if (!aWait && bWait) return 1;
+        return a.name.localeCompare(b.name);
+      });
+
+      sortedChannels.forEach(ch => {
+        const opt = document.createElement('option');
+        opt.value = ch.id;
+        const isLikelyWaitlist = (ch.name || '').toLowerCase().includes('waitlist') || (ch.name || '').toLowerCase().includes('queue');
+        opt.textContent = `${isLikelyWaitlist ? '🎯 ' : '# '}${ch.name}`;
+        channelSelect.appendChild(opt);
+      });
+
+      const likely = sortedChannels.find(ch => (ch.name || '').toLowerCase().includes('waitlist') || (ch.name || '').toLowerCase().includes('queue'));
+      if (likely) {
+        channelSelect.value = likely.id;
+        onCustomChannelChanged(likely.id);
+      }
+    }
+
+    function onCustomChannelChanged(channelId) {
+      const channelSelect = document.getElementById('customChannelSelect');
+      const regionInput = document.getElementById('customRegionInput');
+      const selectedOption = channelSelect.options[channelSelect.selectedIndex];
+      if (selectedOption && selectedOption.textContent) {
+        const chName = selectedOption.textContent.replace(/^[🎯#\s]+/, '');
+        if (regionInput && !regionInput.value) {
+          const guess = autoExtractRegionText(chName);
+          if (guess && guess !== 'GLOBAL') {
+            regionInput.placeholder = `Auto-detected: ${guess}`;
+          }
+        }
+      }
+    }
+
+    function autoExtractRegionText(name) {
+      if (!name) return 'CUSTOM';
+      let clean = name.toLowerCase()
+        .replace(/^#\s*/, '')
+        .replace(/wait-?list/g, '')
+        .replace(/tester-?queue/g, '')
+        .replace(/test-?queue/g, '')
+        .replace(/queue/g, '')
+        .replace(/testing/g, '')
+        .replace(/^[-_]+|[-_]+$/g, '');
+      if (!clean) return 'CUSTOM';
+      const parts = clean.split(/[-_]+/).filter(Boolean);
+      for (const part of parts) {
+        if (part.length >= 2 && part.length <= 4) return part.toUpperCase();
+      }
+      return parts[parts.length - 1].toUpperCase();
+    }
+
+    async function submitAddCustomWaitlist() {
+      const serverSelect = document.getElementById('customServerSelect');
+      const channelSelect = document.getElementById('customChannelSelect');
+      const buttonInput = document.getElementById('customButtonLabelInput');
+      const regionInput = document.getElementById('customRegionInput');
+      const errorMsg = document.getElementById('customModalErrorMsg');
+
+      const guildId = serverSelect.value;
+      const channelId = channelSelect.value;
+      const customButtonText = buttonInput.value.trim() || 'Join Queue';
+      let region = regionInput.value.trim().toUpperCase();
+
+      if (!guildId) {
+        errorMsg.textContent = 'Please choose a Discord server.';
+        errorMsg.style.display = 'block';
+        return;
+      }
+      if (!channelId) {
+        errorMsg.textContent = 'Please select a waitlist channel.';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      const guild = (state.browseGuilds || []).find(g => g.id === guildId);
+      const guildName = guild ? guild.name : 'Custom Server';
+      const selectedChannelOpt = channelSelect.options[channelSelect.selectedIndex];
+      const channelName = selectedChannelOpt ? selectedChannelOpt.textContent.replace(/^[🎯#\s]+/, '') : 'channel';
+
+      if (!region) {
+        region = autoExtractRegionText(channelName);
+      }
+
+      errorMsg.style.display = 'none';
+
+      const target = {
+        guildId,
+        guildName,
+        icon: guild?.icon || null,
+        channelId,
+        channelName,
+        region,
+        customButtonText,
+        isCustom: true,
+      };
+
+      await window.api.addCustomTarget(target);
+      await window.api.armChannel({ channelId, guildName, channelName, region });
+
+      for (const acc of state.accounts.values()) {
+        acc.armedChannels.set(channelId, { guildName, channelName, region });
+      }
+
+      logTimelineEvent(`Added custom waitlist: ${guildName}`, `#${channelName} [${region}] (Button: "${customButtonText}")`, false, null, 'green');
+
+      closeAddCustomModal();
+      await rescanServers();
+    }
+
+    async function removeCustomWaitlist(channelId, e) {
+      if (e) e.stopPropagation();
+      await window.api.removeCustomTarget({ channelId });
+      await window.api.disarmChannel({ channelId });
+      for (const acc of state.accounts.values()) {
+        acc.armedChannels.delete(channelId);
+      }
+      logTimelineEvent('Removed custom waitlist', `Channel ${channelId}`, false, null, 'red');
+      await rescanServers();
+    }
+    async function handleLogin() {
+      const token = document.getElementById('discordTokenInput').value.trim();
+      const errEl = document.getElementById('loginErrorMsg');
+      const btn = document.getElementById('loginSubmitBtn');
+      const btnText = document.getElementById('loginBtnText');
+
+      if (!token) {
+        errEl.textContent = 'Please enter your Discord token.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      errEl.style.display = 'none';
+      btn.disabled = true;
+      btnText.textContent = 'Connecting...';
+
+      const tempId = `acc_${Date.now()}`;
+      state.accounts.set(tempId, {
+        id: tempId,
+        token,
+        user: null,
+        servers: [],
+        armedChannels: new Map(),
+        status: 'connecting',
+      });
+      state.activeAccountId = tempId;
+
+      const result = await window.api.connect({
+        token,
+        settings: state.settings,
+        accountId: tempId,
+      });
+
+      if (!result.success) {
+        state.accounts.delete(tempId);
+        if (state.activeAccountId === tempId) state.activeAccountId = null;
+        await saveAccountsToStorage();
+        errEl.textContent = result.error || 'Failed to connect. Check token.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btnText.textContent = 'Connect';
+        return;
+      }
+
+      const finalId = result.accountId || (result.user && result.user.id) || tempId;
+      let acc = state.accounts.get(tempId) || state.accounts.get(finalId);
+      if (state.accounts.has(tempId) && finalId !== tempId) {
+        state.accounts.delete(tempId);
+      }
+
+      if (!acc) {
+        acc = {
+          id: finalId,
+          token,
+          user: result.user,
+          servers: [],
+          armedChannels: new Map(),
+          status: 'connected',
+        };
+      } else {
+        acc.id = finalId;
+        acc.token = token;
+        acc.user = result.user || acc.user;
+        acc.status = 'connected';
+      }
+
+      state.accounts.set(finalId, acc);
+      state.activeAccountId = finalId;
+
+      await saveAccountsToStorage();
+      updateHeaderAccountUI();
+      renderAccountsDropdown();
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'flex';
+    }
+
+    async function signOutAll() {
+      closeAccountDropdown();
+      await window.api.disconnect();
+      state.accounts.clear();
+      state.activeAccountId = null;
+      try {
+        if (window.api && window.api.storeDelete) {
+          await window.api.storeDelete('accounts');
+          await window.api.storeDelete('activeAccountId');
+          await window.api.storeDelete('legacyToken');
+        }
+        localStorage.removeItem('qpilot_accounts');
+        localStorage.removeItem('qpilot_active_acc');
+        localStorage.removeItem('qpilot_token');
+      } catch (e) {}
+
+      updateHeaderAccountUI();
+      document.getElementById('waitlistsContainer').innerHTML = '';
+      document.getElementById('dashboardView').style.display = 'none';
+      document.getElementById('loginView').style.display = 'flex';
+
+      const btn = document.getElementById('loginSubmitBtn');
+      const btnText = document.getElementById('loginBtnText');
+      if (btn) btn.disabled = false;
+      if (btnText) btnText.textContent = 'Connect';
+
+      logTimelineEvent('Signed out of all accounts', 'Session terminated', false, null, 'red');
+    }
+
+    async function rescanServers() {
+      document.getElementById('emptyStateView').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'flex';
+      renderSkeletonCards();
+      const active = getActiveAccount();
+      await window.api.rescan({ accountId: active?.id });
+    }
+
+    function logTimelineEvent(title, subtitle = '', isHighlight = false, accountName = null, dotColor = 'blue') {
+      const container = document.getElementById('activityLog');
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      const row = document.createElement('div');
+      row.className = 'timeline-event-row';
+
+      let accBadgeHtml = '';
+      if (accountName) {
+        accBadgeHtml = `<span class="event-account-pill">[${escapeHtml(accountName)}]</span>`;
+      }
+
+      row.innerHTML = `
+        <div class="event-timestamp">${timeStr}</div>
+        <div class="event-node-dot ${dotColor}"></div>
+        <div class="event-content-wrap">
+          <div class="event-title-line">
+            ${accBadgeHtml}
+            <span>${escapeHtml(title)}</span>
+          </div>
+          ${subtitle ? `<div class="event-subtitle-line">${escapeHtml(subtitle)}</div>` : ''}
+        </div>
+      `;
+
+      container.appendChild(row);
+
+      while (container.children.length > 100) {
+        container.removeChild(container.firstChild);
+      }
+
+      const scrollBody = document.getElementById('activityScrollBody');
+      if (scrollBody) {
+        scrollBody.scrollTop = scrollBody.scrollHeight;
+      }
+    }
+
+    function clearActivityLog() {
+      document.getElementById('activityLog').innerHTML = '';
+    }
+
+    function toggleSettingsDrawer(open) {
+      const drawer = document.getElementById('settingsDrawer');
+      const backdrop = document.getElementById('drawerBackdrop');
+      if (open) {
+        drawer?.classList.add('open');
+        backdrop?.classList.add('open');
+      } else {
+        drawer?.classList.remove('open');
+        backdrop?.classList.remove('open');
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        const drawer = document.getElementById('settingsDrawer');
+        if (drawer && drawer.classList.contains('open')) {
+          toggleSettingsDrawer(false);
+          return;
+        }
+
+        const addCustomModal = document.getElementById('addCustomModal');
+        if (addCustomModal && addCustomModal.style.display === 'flex') {
+          closeAddCustomModal();
+          return;
+        }
+
+        const addAccountModal = document.getElementById('addAccountModal');
+        if (addAccountModal && addAccountModal.style.display === 'flex') {
+          closeAddAccountModal();
+          return;
+        }
+
+        const queueModal = document.getElementById('queueEnteredModal');
+        if (queueModal && queueModal.style.display === 'flex') {
+          closeQueueEnteredModal();
+          return;
+        }
+
+        const accDropdown = document.getElementById('accountDropdown');
+        if (accDropdown && accDropdown.classList.contains('show')) {
+          accDropdown.classList.remove('show');
+          const pill = document.getElementById('userPill');
+          if (pill) pill.classList.remove('open');
+          return;
+        }
+      }
+    });
+
+    function updateSettingsUI() {
+      const cps = document.getElementById('sliderCps').value;
+      const burst = document.getElementById('sliderBurst').value;
+      const cooldown = document.getElementById('sliderCooldown').value;
+
+      document.getElementById('badgeCps').textContent = `${cps}/s`;
+      document.getElementById('badgeBurst').textContent = `${burst} s`;
+      document.getElementById('badgeCooldown').textContent = `${cooldown} s`;
+
+      const pauseAfterJoin = document.getElementById('checkPauseAfterJoin')?.checked ?? true;
+      const pauseDuration = parseInt(document.getElementById('sliderPauseDuration')?.value || '60', 10);
+      const badgePause = document.getElementById('badgePauseDuration');
+      const groupPauseDuration = document.getElementById('groupPauseDuration');
+
+      if (badgePause) {
+        if (pauseDuration >= 60) {
+          const hrs = Math.floor(pauseDuration / 60);
+          const mins = pauseDuration % 60;
+          badgePause.textContent = mins > 0 ? `${pauseDuration} min (${hrs}h ${mins}m)` : `${pauseDuration} min (${hrs} hr${hrs > 1 ? 's' : ''})`;
+        } else {
+          badgePause.textContent = `${pauseDuration} min`;
+        }
+      }
+      if (groupPauseDuration) {
+        groupPauseDuration.style.opacity = pauseAfterJoin ? '1' : '0.35';
+        groupPauseDuration.style.pointerEvents = pauseAfterJoin ? 'auto' : 'none';
+      }
+
+      const pauseOnIdle = document.getElementById('checkPauseOnIdle')?.checked ?? true;
+      const idleThreshold = parseInt(document.getElementById('sliderIdleThreshold')?.value || '5', 10);
+      const badgeIdle = document.getElementById('badgeIdleThreshold');
+      const groupIdleThreshold = document.getElementById('groupIdleThreshold');
+
+      if (badgeIdle) {
+        badgeIdle.textContent = `${idleThreshold} min`;
+      }
+      if (groupIdleThreshold) {
+        groupIdleThreshold.style.opacity = pauseOnIdle ? '1' : '0.35';
+        groupIdleThreshold.style.pointerEvents = pauseOnIdle ? 'auto' : 'none';
+      }
+    }
+
+    function saveSettings() {
+      state.settings.cps = parseInt(document.getElementById('sliderCps').value, 10);
+      state.settings.burstLength = parseFloat(document.getElementById('sliderBurst').value);
+      state.settings.cooldown = parseInt(document.getElementById('sliderCooldown').value, 10);
+
+      const pauseAfterJoin = document.getElementById('checkPauseAfterJoin').checked;
+      const pauseDurationMinutes = parseInt(document.getElementById('sliderPauseDuration').value, 10);
+      const pauseOnIdle = document.getElementById('checkPauseOnIdle').checked;
+      const idleThresholdMinutes = parseInt(document.getElementById('sliderIdleThreshold').value, 10);
+      const minimizeToTray = document.getElementById('checkMinimizeToTray') ? document.getElementById('checkMinimizeToTray').checked : true;
+
+      state.settings.pauseAfterJoin = pauseAfterJoin;
+      state.settings.pauseDurationMinutes = pauseDurationMinutes;
+      state.settings.pauseOnIdle = pauseOnIdle;
+      state.settings.idleThresholdMinutes = idleThresholdMinutes;
+      state.settings.minimizeToTray = minimizeToTray;
+
+      if (!pauseAfterJoin && state.queuePauseUntil > 0) {
+        resumeSnipingNow();
+      }
+
+      try {
+        localStorage.setItem('qpilot_settings', JSON.stringify(state.settings));
+      } catch (e) {}
+
+      window.api.updateSettings(state.settings);
+      toggleSettingsDrawer(false);
+      logTimelineEvent('Saved click & queue settings', `${state.settings.cps}/s, ${state.settings.burstLength}s burst, idle ${idleThresholdMinutes}m`, false, null, 'blue');
+    }
+
+    function playQueueSuccessSound() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, now);
+        gain1.gain.setValueAtTime(0, now);
+        gain1.gain.linearRampToValueAtTime(0.2, now + 0.04);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.36);
+
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(880, now + 0.12);
+        gain2.gain.setValueAtTime(0, now + 0.12);
+        gain2.gain.linearRampToValueAtTime(0.25, now + 0.16);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now + 0.12);
+        osc2.stop(now + 0.62);
+      } catch (e) {
+        console.warn('[Audio] Failed to play queue chime:', e);
+      }
+    }
+
+    function triggerQueueJoinedPrompt(info) {
+      playQueueSuccessSound();
+
+      const modal = document.getElementById('queueEnteredModal');
+      const modalGuild = document.getElementById('modalQueueGuild');
+      const modalRegion = document.getElementById('modalQueueRegion');
+      const modalLatency = document.getElementById('modalQueueLatency');
+      const modalCooldownNotice = document.getElementById('modalCooldownNotice');
+      const modalPauseMinutes = document.getElementById('modalPauseMinutes');
+      const modalResumeNowBtn = document.getElementById('modalResumeNowBtn');
+
+      if (modalGuild) modalGuild.textContent = info.guildName || 'Waitlist Queue';
+      if (modalRegion) {
+        const detail = info.channelName ? `${info.region || 'Waitlist'} (#${info.channelName})` : (info.region || 'Waitlist');
+        modalRegion.textContent = detail;
+      }
+      if (modalLatency) {
+        modalLatency.textContent = `Joined in ${info.latencyMs || 0} ms (${info.clicks || 1} click${(info.clicks || 1) === 1 ? '' : 's'})`;
+      }
+
+      if (state.settings.pauseAfterJoin !== false) {
+        const pauseMins = state.settings.pauseDurationMinutes || 60;
+        const pauseUntil = Date.now() + (pauseMins * 60 * 1000);
+        state.queuePauseUntil = pauseUntil;
+
+        if (modalCooldownNotice) modalCooldownNotice.style.display = 'flex';
+        if (modalResumeNowBtn) modalResumeNowBtn.style.display = 'inline-block';
+        if (modalPauseMinutes) modalPauseMinutes.textContent = `${pauseMins} minutes`;
+
+        window.api.setQueuePaused({ paused: true, pauseUntil });
+        updatePauseCountdown();
+
+        const pill = document.getElementById('queuePausedPill');
+        if (pill) pill.style.display = 'inline-flex';
+
+        logTimelineEvent('Queue Protection Active', `Paused other tierlists for ${pauseMins}m`, false, null, 'amber');
+      } else {
+        if (modalCooldownNotice) modalCooldownNotice.style.display = 'none';
+        if (modalResumeNowBtn) modalResumeNowBtn.style.display = 'none';
+      }
+
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeQueueEnteredModal() {
+      const modal = document.getElementById('queueEnteredModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function closeQueueModalOnBackdrop(e) {
+      if (e.target && e.target.id === 'queueEnteredModal') {
+        closeQueueEnteredModal();
+      }
+    }
+
+    function resumeSnipingNow() {
+      state.queuePauseUntil = 0;
+      window.api.setQueuePaused({ paused: false, pauseUntil: 0 });
+
+      const pill = document.getElementById('queuePausedPill');
+      if (pill) pill.style.display = 'none';
+
+      const modal = document.getElementById('queueEnteredModal');
+      if (modal) modal.style.display = 'none';
+
+      logTimelineEvent('Queue Sniping Resumed', 'Queue protection manually lifted', false, null, 'green');
+    }
+
+    function updatePauseCountdown() {
+      const pill = document.getElementById('queuePausedPill');
+      const pillText = document.getElementById('queuePausedPillText');
+      const modalNotice = document.getElementById('modalCooldownNotice');
+      const modalResumeCountdown = document.getElementById('modalResumeCountdown');
+
+      if (!state.queuePauseUntil || Date.now() >= state.queuePauseUntil) {
+        if (state.queuePauseUntil > 0) {
+          state.queuePauseUntil = 0;
+          window.api.setQueuePaused({ paused: false, pauseUntil: 0 });
+          logTimelineEvent('Queue Cooldown Expired', 'Sniping automatically resumed on all tierlists', false, null, 'green');
+        }
+        if (pill) pill.style.display = 'none';
+        if (modalNotice && modalNotice.style.display !== 'none') {
+          if (modalResumeCountdown) modalResumeCountdown.textContent = 'Protection period ended. Sniping resumed.';
+        }
+        return;
+      }
+
+      const remainingMs = Math.max(0, state.queuePauseUntil - Date.now());
+      const totalSec = Math.ceil(remainingMs / 1000);
+      const minutes = Math.floor(totalSec / 60);
+      const seconds = totalSec % 60;
+      const timeFormatted = `${minutes}m ${String(seconds).padStart(2, '0')}s`;
+
+      if (pill) {
+        pill.style.display = 'inline-flex';
+        if (pillText) pillText.textContent = `Paused (${minutes > 0 ? minutes + 'm' : seconds + 's'})`;
+      }
+
+      if (modalResumeCountdown) {
+        modalResumeCountdown.textContent = `Resumes in ${timeFormatted}`;
+      }
+    }
+
+    setInterval(updatePauseCountdown, 1000);
+
+    function toggleTokenVisibility() {
+      const input = document.getElementById('discordTokenInput');
+      const eyeIcon = document.getElementById('eyeIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        eyeIcon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+      } else {
+        input.type = 'password';
+        eyeIcon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+      }
+    }
+
+    function copyTokenScript() {
+      const code = document.getElementById('discordTokenScript').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const tooltip = document.getElementById('copyTooltip');
+        if (tooltip) {
+          tooltip.style.display = 'block';
+          setTimeout(() => { tooltip.style.display = 'none'; }, 2000);
+        }
+        logTimelineEvent('Copied snippet', 'Extraction script copied to clipboard', false, null, 'blue');
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escapeQuotes(str) {
+      return String(str || '').replace(/'/g, "\\'");
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      if (window.api && window.api.onTrayAction) {
+        window.api.onTrayAction((data) => {
+          if (data && data.action === 'pause') {
+            const pauseMins = state.settings.pauseDurationMinutes || 60;
+            state.queuePauseUntil = data.pauseUntil || (Date.now() + pauseMins * 60000);
+            updatePauseCountdown();
+            logTimelineEvent('Tray Action', `Sniping paused from system tray for ${pauseMins}m`, false, null, 'amber');
+          } else if (data && data.action === 'resume') {
+            resumeSnipingNow();
+          }
+        });
+      }
+
+      document.getElementById('loginView').style.display = 'none';
+
+      const hasAccounts = await loadAccountsFromStorage();
+      if (!hasAccounts || state.accounts.size === 0) {
+        document.getElementById('loginView').style.display = 'flex';
+        document.getElementById('dashboardView').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'flex';
+      renderSkeletonCards();
+      updateHeaderAccountUI();
+      renderAccountsDropdown();
+
+      for (const [id, acc] of Array.from(state.accounts.entries())) {
+        if (acc.token && acc.token.trim().length > 10) {
+          window.api.connect({
+            token: acc.token,
+            settings: state.settings,
+            accountId: acc.id,
+          }).then((res) => {
+            if (res.success && res.user) {
+              acc.user = res.user;
+              acc.status = 'connected';
+              saveAccountsToStorage();
+              updateHeaderAccountUI();
+              renderAccountsDropdown();
+            } else if (!res.success) {
+              console.warn(`[AutoConnect] Failed for account ${id}:`, res.error);
+              logTimelineEvent('Failed to auto-connect', res.error || 'Token invalid', false, acc.user?.username || 'Account', 'red');
+            }
+          }).catch((err) => {
+            console.error('Failed to reconnect account:', id, err);
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>
