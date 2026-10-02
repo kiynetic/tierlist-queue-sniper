@@ -7,7 +7,10 @@
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
-    "package": "electron-packager . qPilot --platform=win32 --arch=x64 --out=dist --overwrite --icon=src/assets/icon.ico"
+    "package": "electron-packager . qPilot --platform=win32 --arch=x64 --out=dist --overwrite --icon=src/assets/icon.ico --asar --ignore=\"^/\\.qpilot_data\" --ignore=\"^/dist\" --ignore=\"^/\\.git\" --prune=true",
+    "build:portable": "powershell -ExecutionPolicy Bypass -File build/build.ps1 -Target Portable",
+    "build:installer": "powershell -ExecutionPolicy Bypass -File build/build.ps1 -Target Installer",
+    "build:all": "powershell -ExecutionPolicy Bypass -File build/build.ps1 -Target All"
   },
   "dependencies": {
     "@phosphor-icons/web": "^2.1.2",
