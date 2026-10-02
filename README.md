@@ -1,6 +1,6 @@
-# qPilot - Discord Tierlist Queue Sniper
+# qPilot - Minecraft PvP Tierlist Queue Sniper (Supports MCTiers, PvPTiers and more)
 
-A fast desktop application built with Electron to monitor Discord servers and instantly snipe waitlists for MCTiers, PvPTiers, and custom tierlist servers.
+A very customizable fast desktop application built with Electron to monitor Discord servers and instantly snipe waitlists for MCTiers, PvPTiers, and custom tierlist servers.
 
 qPilot connects directly to Discord Gateway WebSockets to detect message updates and interaction buttons the millisecond they appear, joining queues faster than manual clicking.
 
@@ -9,11 +9,11 @@ qPilot connects directly to Discord Gateway WebSockets to detect message updates
 ## Features
 
 - **Instant Gateway Sniping**: Listens to raw Discord Gateway WebSocket events. When a queue opens, it fires interaction requests immediately without polling lag.
-- **Dynamic Channel Detection**: Automatically scans your joined servers for waitlist channels across regions (North America, Europe, Asia, Australia, Africa, etc.) without relying on hardcoded channel names.
-- **Custom Server & Button Support**: Add any server and waitlist channel manually. You can also define custom join button labels (like "Enter Queue" or "Join Waitlist") for lesser-known tierlists.
+- **Dynamic Channel Detection**: Automatically scans your joined servers for waitlist channels across regions (AS/AU/NA/EU/AF/SA and more)
+- **Custom Server & Button Support**: Add any server and waitlist channel manually. You can also define custom join button labels (like "Enter Queue" or "Join Waitlist") for lesser-known tierlists (or cracked tierlists)
 - **Multi-Account Sniping**: Connect multiple Discord accounts and arm them simultaneously.
 - **Queue Cooldown & Anti-Clash**: Displays a prompt when you successfully join a queue and can pause other tierlists for a configurable duration (default 1 hour) so you do not accidentally get into two queues at the same time.
-- **Idle Detection**: Automatically pauses queue joining when your computer is left completely idle with no mouse or keyboard input for a set amount of time.
+- **Idle Detection**: Automatically pauses queue joining when your computer is left completely idle with no mouse or keyboard input for a set amount of time. This can be changed in settings.
 - **System Tray Integration**: Minimize to tray with quick pause and resume controls from the taskbar context menu.
 - **Local & Secure**: Your Discord tokens are stored locally on your machine and never sent anywhere else.
 
