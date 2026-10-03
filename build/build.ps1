@@ -32,6 +32,13 @@ if ($Target -eq "Portable" -or $Target -eq "All") {
 if ($Target -eq "Installer" -or $Target -eq "All") {
     Write-Host "Compiling setup installer..." -ForegroundColor Cyan
     if (Test-Path $InstallerExe) { Remove-Item $InstallerExe -Force }
-    & $CscPath /target:winexe /optimize+ /out:$InstallerExe /win32icon:(Join-Path $Root "src\assets\icon.ico") /resource:$PortableZip,qpilot_payload /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /r:Microsoft.CSharp.dll (Join-Path $Root "build\Installer.cs")
+    $outArg = "/out:$InstallerExe"
+    $iconArg = "/win32icon:" + (Join-Path $Root "src\assets\icon.ico")
+    $resArg = "/resource:$PortableZip,qpilot_payload"
+    $sourceFile = Join-Path $Root "build\Installer.cs"
+    & $CscPath /target:winexe /optimize+ $outArg $iconArg $resArg /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /r:Microsoft.CSharp.dll $sourceFile
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to compile setup installer"
+    }
     Write-Host "Installer build complete: $InstallerExe" -ForegroundColor Green
 }
