@@ -609,7 +609,7 @@ namespace QPilotInstaller
                     {
                         key.SetValue("DisplayName", "qPilot");
                         key.SetValue("DisplayVersion", "1.0.0");
-                        key.SetValue("Publisher", "2x360");
+                        key.SetValue("Publisher", "kiynetic");
                         key.SetValue("DisplayIcon", targetExe + ",0");
                         key.SetValue("InstallLocation", installDir);
                         key.SetValue("UninstallString", "\"" + uninstallerExe + "\" /uninstall");

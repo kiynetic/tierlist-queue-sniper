@@ -472,7 +472,7 @@ ipcMain.handle('discord:getCustomTargets', async () => {
   return store.customTargets || [];
 });
 
-const GITHUB_REPO = '2x360/tierlist-queue-sniper';
+const GITHUB_REPO = 'kiynetic/tierlist-queue-sniper';
 
 function fetchLatestGithubRelease() {
   return new Promise((resolve, reject) => {

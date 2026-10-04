@@ -30,7 +30,7 @@ qPilot connects directly to Discord Gateway WebSockets to detect message updates
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/2x360/tierlist-queue-sniper.git
+   git clone https://github.com/kiynetic/tierlist-queue-sniper.git
    cd tierlist-queue-sniper
    ```
 
