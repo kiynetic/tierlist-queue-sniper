@@ -22,6 +22,10 @@ contextBridge.exposeInMainWorld('api', {
   removeCustomTarget: (data) => ipcRenderer.invoke('discord:removeCustomTarget', data),
   getCustomTargets: () => ipcRenderer.invoke('discord:getCustomTargets'),
 
+  checkForUpdates: () => ipcRenderer.invoke('updater:check'),
+  installUpdate: (data) => ipcRenderer.invoke('updater:install', data),
+  onUpdateProgress: (cb) => ipcRenderer.on('updater:progress', (_, d) => cb(d)),
+
   onReady: (cb) => ipcRenderer.on('discord:ready', (_, d) => cb(d)),
   onScanning: (cb) => ipcRenderer.on('discord:scanning', (_, d) => cb(d)),
   onServers: (cb) => ipcRenderer.on('discord:servers', (_, d) => cb(d)),

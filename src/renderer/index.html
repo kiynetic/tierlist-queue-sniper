@@ -2821,6 +2821,126 @@
       border-color: rgba(245, 158, 11, 0.6);
     }
 
+    .update-notes-box {
+      max-height: 140px;
+      overflow-y: auto;
+      background: #12131c;
+      border: 1px solid #1f2233;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 12px;
+      color: #cbd5e1;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .update-progress-container {
+      margin-top: 14px;
+      background: #141624;
+      border: 1px solid #23273e;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .update-progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: #0f1019;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #1e2236;
+    }
+
+    .update-progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8 0%, #6366f1 100%);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+      transition: width 0.15s ease-out;
+      border-radius: 999px;
+    }
+
+    .update-progress-labels {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+
+    .update-settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #141624;
+      border: 1px solid #23273e;
+      border-radius: 14px;
+      margin-top: 6px;
+    }
+
+    .update-settings-left {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .update-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 10.5px;
+      font-weight: 700;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #38bdf8;
+    }
+
+    .btn-update-now {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+      padding: 9px 18px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-update-now:hover {
+      background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+      box-shadow: 0 6px 18px rgba(56, 189, 248, 0.5);
+    }
+
+    .btn-update-secondary {
+      background: #181926;
+      border: 1px solid #2a2c40;
+      color: #94a3b8;
+      padding: 9px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-update-secondary:hover {
+      background: #202234;
+      color: #ffffff;
+      border-color: #3e4260;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -3141,6 +3261,23 @@
           </label>
         </div>
 
+        <div class="setting-divider"></div>
+        <div class="setting-section-title">Application Updates</div>
+
+        <div class="update-settings-row">
+          <div class="update-settings-left">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="setting-label">qPilot Version</span>
+              <span class="update-badge-pill" id="settingsCurrentVersionPill">v1.0.0</span>
+            </div>
+            <span class="setting-sublabel" id="settingsUpdateStatusText">You are on the latest version</span>
+          </div>
+          <button class="btn-update-secondary" id="btnSettingsCheckUpdates" onclick="manualCheckForUpdates()" style="padding: 6px 14px; font-size: 11.5px;">
+            <i class="ph ph-arrows-clockwise" style="font-size: 13px;"></i>
+            <span>Check now</span>
+          </button>
+        </div>
+
         <p class="setting-explanation">
           Each queue message gets one burst of clicks at the set rate. Once joined or once the burst duration ends, clicks immediately stop and enforce the cooldown timeout.
         </p>
@@ -3188,6 +3325,53 @@
         <div class="queue-modal-footer">
           <button class="resume-now-btn" id="modalResumeNowBtn" onclick="resumeSnipingNow()">Resume Other Queues Now</button>
           <button class="modal-submit-btn" onclick="closeQueueEnteredModal()">Keep Paused & Close</button>
+        </div>
+      </div>
+    <div class="modal-backdrop" id="updateModal" style="display: none;" onclick="closeUpdateModalOnBackdrop(event)">
+      <div class="modal-card" style="width: 480px; max-width: 92vw;">
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <div class="modal-badge-icon" style="color: #38bdf8;">
+              <i class="ph ph-sparkle" style="font-size: 22px;"></i>
+            </div>
+            <div>
+              <div class="modal-title" id="updateModalTitle">Update Available</div>
+              <div class="modal-subtitle" id="updateModalSubtitle">A new version of qPilot is ready to install</div>
+            </div>
+          </div>
+          <button class="modal-close-btn" onclick="closeUpdateModal()"><i class="ph ph-x"></i></button>
+        </div>
+
+        <div class="modal-body" style="gap: 14px;">
+          <div style="font-size: 11.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">What's New</div>
+          <div class="update-notes-box" id="updateReleaseNotesBox">
+            Release updates and improvements.
+          </div>
+
+          <div class="update-progress-container" id="updateProgressSection" style="display: none;">
+            <div class="update-progress-labels">
+              <span id="updateProgressStatusText">Downloading update...</span>
+              <span id="updateProgressPercentText" style="font-weight: 700; color: #38bdf8;">0%</span>
+            </div>
+            <div class="update-progress-bar-bg">
+              <div class="update-progress-bar-fill" id="updateProgressBarFill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" id="updateActionButtons" style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px;">
+          <button class="btn-update-secondary" id="btnIgnoreUpdate" onclick="ignoreUpdateForNow()" style="font-size: 12px;">
+            Don't show again
+          </button>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="btn-update-secondary" onclick="closeUpdateModal()" style="font-size: 12px;">
+              Later
+            </button>
+            <button class="btn-update-now" id="btnPerformUpdate" onclick="startUpdateInstallation()">
+              <i class="ph ph-download-simple" style="font-size: 14px;"></i>
+              <span>Update now</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -3473,7 +3657,9 @@
         pauseDurationMinutes: 60,
         pauseOnIdle: true,
         idleThresholdMinutes: 5,
+        ignoredUpdateVersion: null,
       },
+      availableUpdate: null,
       queuePauseUntil: 0,
       isIdlePaused: false,
       collapsedCards: new Set(),
@@ -4821,6 +5007,12 @@
           return;
         }
 
+        const updateModal = document.getElementById('updateModal');
+        if (updateModal && updateModal.style.display === 'flex') {
+          closeUpdateModal();
+          return;
+        }
+
         const queueModal = document.getElementById('queueEnteredModal');
         if (queueModal && queueModal.style.display === 'flex') {
           closeQueueEnteredModal();
@@ -4999,6 +5191,192 @@
       }
     }
 
+    function closeUpdateModal() {
+      const modal = document.getElementById('updateModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function closeUpdateModalOnBackdrop(e) {
+      if (e.target && e.target.id === 'updateModal') {
+        closeUpdateModal();
+      }
+    }
+
+    function showUpdateModal(updateInfo) {
+      if (!updateInfo) return;
+      state.availableUpdate = updateInfo;
+
+      const title = document.getElementById('updateModalTitle');
+      const subtitle = document.getElementById('updateModalSubtitle');
+      const notesBox = document.getElementById('updateReleaseNotesBox');
+      const progressSec = document.getElementById('updateProgressSection');
+      const actionBtns = document.getElementById('updateActionButtons');
+      const updateNowBtn = document.getElementById('btnPerformUpdate');
+      const btnIgnore = document.getElementById('btnIgnoreUpdate');
+
+      if (title) title.textContent = `Update Available: v${updateInfo.latestVersion}`;
+      if (subtitle) subtitle.textContent = `qPilot v${updateInfo.latestVersion} is ready to download and install`;
+      if (notesBox) {
+        notesBox.textContent = updateInfo.body && updateInfo.body.trim().length > 0
+          ? updateInfo.body
+          : `Release v${updateInfo.latestVersion} contains enhancements, bug fixes, and stability improvements.`;
+      }
+
+      if (progressSec) progressSec.style.display = 'none';
+      if (actionBtns) actionBtns.style.display = 'flex';
+      if (updateNowBtn) {
+        updateNowBtn.disabled = false;
+        updateNowBtn.innerHTML = `<i class="ph ph-download-simple" style="font-size: 14px;"></i><span>Update now</span>`;
+      }
+      if (btnIgnore) btnIgnore.disabled = false;
+
+      const modal = document.getElementById('updateModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function ignoreUpdateForNow() {
+      if (state.availableUpdate && state.availableUpdate.latestVersion) {
+        state.settings.ignoredUpdateVersion = state.availableUpdate.latestVersion;
+        try {
+          localStorage.setItem('qpilot_settings', JSON.stringify(state.settings));
+        } catch (e) {}
+        logTimelineEvent('Update Ignored', `Version v${state.availableUpdate.latestVersion} won't prompt on startup`, false, null, 'blue');
+      }
+      closeUpdateModal();
+    }
+
+    async function startUpdateInstallation() {
+      if (!state.availableUpdate || !state.availableUpdate.downloadUrl) return;
+
+      const progressSec = document.getElementById('updateProgressSection');
+      const progressBar = document.getElementById('updateProgressBarFill');
+      const progressPercent = document.getElementById('updateProgressPercentText');
+      const progressStatus = document.getElementById('updateProgressStatusText');
+      const updateNowBtn = document.getElementById('btnPerformUpdate');
+      const btnIgnore = document.getElementById('btnIgnoreUpdate');
+
+      if (progressSec) progressSec.style.display = 'flex';
+      if (progressBar) progressBar.style.width = '0%';
+      if (progressPercent) progressPercent.textContent = '0%';
+      if (progressStatus) progressStatus.textContent = 'Connecting and downloading update...';
+
+      if (updateNowBtn) updateNowBtn.disabled = true;
+      if (btnIgnore) btnIgnore.disabled = true;
+
+      logTimelineEvent('Downloading Update', `Downloading v${state.availableUpdate.latestVersion}...`, false, null, 'blue');
+
+      try {
+        const res = await window.api.installUpdate({
+          downloadUrl: state.availableUpdate.downloadUrl,
+          assetName: state.availableUpdate.assetName,
+        });
+
+        if (!res.success) {
+          if (progressStatus) progressStatus.textContent = `Update failed: ${res.error || 'Unknown error'}`;
+          if (updateNowBtn) updateNowBtn.disabled = false;
+          if (btnIgnore) btnIgnore.disabled = false;
+          logTimelineEvent('Update Failed', res.error || 'Could not download installer', false, null, 'red');
+        } else if (res.openedFolder) {
+          if (progressStatus) progressStatus.textContent = 'Update downloaded! Opening folder...';
+          logTimelineEvent('Update Ready', 'Portable update package opened in folder', false, null, 'green');
+        } else {
+          if (progressStatus) progressStatus.textContent = 'Launching installer... Restarting qPilot.';
+          logTimelineEvent('Installing Update', 'Setup launched. qPilot will now restart.', false, null, 'green');
+        }
+      } catch (err) {
+        if (progressStatus) progressStatus.textContent = `Update failed: ${err.message || 'Error occurred'}`;
+        if (updateNowBtn) updateNowBtn.disabled = false;
+        if (btnIgnore) btnIgnore.disabled = false;
+        logTimelineEvent('Update Failed', err.message || 'Download error', false, null, 'red');
+      }
+    }
+
+    async function checkAutoUpdatesOnStartup() {
+      if (!window.api || !window.api.checkForUpdates) return;
+      try {
+        const info = await window.api.checkForUpdates();
+        if (!info || !info.success) return;
+
+        const versionPill = document.getElementById('settingsCurrentVersionPill');
+        const statusText = document.getElementById('settingsUpdateStatusText');
+
+        if (versionPill && info.currentVersion) {
+          versionPill.textContent = `v${info.currentVersion}`;
+        }
+
+        if (info.hasUpdate) {
+          if (statusText) {
+            statusText.textContent = `Update available: v${info.latestVersion}`;
+            statusText.style.color = '#38bdf8';
+          }
+
+          if (state.settings.ignoredUpdateVersion === info.latestVersion) {
+            return;
+          }
+
+          showUpdateModal(info);
+        } else {
+          if (statusText) {
+            statusText.textContent = 'You are on the latest version';
+            statusText.style.color = '#828292';
+          }
+        }
+      } catch (err) {
+        console.warn('Auto update check failed:', err);
+      }
+    }
+
+    async function manualCheckForUpdates() {
+      if (!window.api || !window.api.checkForUpdates) return;
+      const btn = document.getElementById('btnSettingsCheckUpdates');
+      const statusText = document.getElementById('settingsUpdateStatusText');
+      const versionPill = document.getElementById('settingsCurrentVersionPill');
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="ph ph-arrows-clockwise animate-spin" style="font-size: 13px;"></i><span>Checking...</span>`;
+      }
+      if (statusText) {
+        statusText.textContent = 'Checking GitHub for newer releases...';
+        statusText.style.color = '#828292';
+      }
+
+      try {
+        const info = await window.api.checkForUpdates();
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="ph ph-arrows-clockwise" style="font-size: 13px;"></i><span>Check now</span>`;
+        }
+
+        if (info && info.currentVersion && versionPill) {
+          versionPill.textContent = `v${info.currentVersion}`;
+        }
+
+        if (info && info.hasUpdate) {
+          if (statusText) {
+            statusText.textContent = `Update available: v${info.latestVersion}`;
+            statusText.style.color = '#38bdf8';
+          }
+          showUpdateModal(info);
+        } else {
+          if (statusText) {
+            statusText.textContent = 'You are on the latest version';
+            statusText.style.color = '#828292';
+          }
+          logTimelineEvent('Up to date', `You are running the latest version (v${info?.currentVersion || '1.0.0'})`, false, null, 'green');
+        }
+      } catch (err) {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="ph ph-arrows-clockwise" style="font-size: 13px;"></i><span>Check now</span>`;
+        }
+        if (statusText) {
+          statusText.textContent = 'Check failed. Unable to connect to GitHub.';
+          statusText.style.color = '#f87171';
+        }
+      }
+    }
+
     function resumeSnipingNow() {
       state.queuePauseUntil = 0;
       window.api.setQueuePaused({ paused: false, pauseUntil: 0 });
@@ -5104,6 +5482,23 @@
           }
         });
       }
+
+      if (window.api && window.api.onUpdateProgress) {
+        window.api.onUpdateProgress((data) => {
+          const progressBar = document.getElementById('updateProgressBarFill');
+          const progressPercent = document.getElementById('updateProgressPercentText');
+          const progressStatus = document.getElementById('updateProgressStatusText');
+          if (progressBar) progressBar.style.width = `${data.percent}%`;
+          if (progressPercent) progressPercent.textContent = `${data.percent}%`;
+          if (progressStatus) {
+            const mbDownloaded = (data.downloadedBytes / (1024 * 1024)).toFixed(1);
+            const mbTotal = (data.totalBytes / (1024 * 1024)).toFixed(1);
+            progressStatus.textContent = `Downloading update... ${mbDownloaded} MB of ${mbTotal} MB`;
+          }
+        });
+      }
+
+      checkAutoUpdatesOnStartup();
 
       document.getElementById('loginView').style.display = 'none';
 

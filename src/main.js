@@ -1,6 +1,8 @@
 const { app, BrowserWindow, Menu, ipcMain, powerMonitor, Tray, nativeImage } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const https = require('https');
+const { spawn } = require('child_process');
 const DiscordClient = require('./discord/client');
 
 Menu.setApplicationMenu(null);
@@ -468,6 +470,155 @@ ipcMain.handle('discord:removeCustomTarget', async (event, { channelId }) => {
 ipcMain.handle('discord:getCustomTargets', async () => {
   const store = readStore();
   return store.customTargets || [];
+});
+
+const GITHUB_REPO = '2x360/tierlist-queue-sniper';
+
+function fetchLatestGithubRelease() {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: 'api.github.com',
+      path: `/repos/${GITHUB_REPO}/releases/latest`,
+      headers: {
+        'User-Agent': 'qPilot-Desktop-App',
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    };
+
+    https.get(options, (res) => {
+      let data = '';
+      res.on('data', chunk => { data += chunk; });
+      res.on('end', () => {
+        try {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(JSON.parse(data));
+          } else {
+            reject(new Error(`GitHub API returned status ${res.statusCode}`));
+          }
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }).on('error', reject);
+  });
+}
+
+function parseSemver(v) {
+  return (v || '').replace(/^[^\d]*/, '').split('-')[0].split('.').map(n => parseInt(n, 10) || 0);
+}
+
+function isNewerVersion(remote, local) {
+  const r = parseSemver(remote);
+  const l = parseSemver(local);
+  for (let i = 0; i < Math.max(r.length, l.length); i++) {
+    const rv = r[i] || 0;
+    const lv = l[i] || 0;
+    if (rv > lv) return true;
+    if (rv < lv) return false;
+  }
+  return false;
+}
+
+ipcMain.handle('updater:check', async () => {
+  try {
+    const release = await fetchLatestGithubRelease();
+    const currentVersion = app.getVersion();
+    const latestVersion = (release.tag_name || '').replace(/^v/, '');
+    const hasUpdate = isNewerVersion(latestVersion, currentVersion);
+
+    const assets = release.assets || [];
+    const installerAsset = assets.find(a => a.name.endsWith('-Setup.exe') || a.name.endsWith('.exe'));
+    const zipAsset = assets.find(a => a.name.endsWith('.zip'));
+
+    return {
+      success: true,
+      hasUpdate,
+      currentVersion,
+      latestVersion,
+      name: release.name || `Release ${latestVersion}`,
+      body: release.body || '',
+      publishedAt: release.published_at,
+      releaseUrl: release.html_url,
+      downloadUrl: installerAsset ? installerAsset.browser_download_url : (zipAsset ? zipAsset.browser_download_url : release.html_url),
+      assetName: installerAsset ? installerAsset.name : (zipAsset ? zipAsset.name : null),
+      assetSize: installerAsset ? installerAsset.size : (zipAsset ? zipAsset.size : 0)
+    };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('updater:install', async (event, { downloadUrl, assetName }) => {
+  if (!downloadUrl) return { success: false, error: 'No download URL provided' };
+
+  const fileName = assetName || 'qPilot-Update.exe';
+  const tempDir = app.getPath('temp');
+  const targetPath = path.join(tempDir, fileName);
+
+  try {
+    if (fs.existsSync(targetPath)) {
+      try { fs.unlinkSync(targetPath); } catch {}
+    }
+
+    const downloadFile = (url, dest) => {
+      return new Promise((resolve, reject) => {
+        const file = fs.createWriteStream(dest);
+        const req = https.get(url, { headers: { 'User-Agent': 'qPilot-Updater' } }, (res) => {
+          if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+            file.close();
+            try { fs.unlinkSync(dest); } catch {}
+            return downloadFile(res.headers.location, dest).then(resolve).catch(reject);
+          }
+
+          if (res.statusCode !== 200) {
+            file.close();
+            try { fs.unlinkSync(dest); } catch {}
+            return reject(new Error(`Failed to download: status ${res.statusCode}`));
+          }
+
+          const totalBytes = parseInt(res.headers['content-length'] || '0', 10);
+          let downloadedBytes = 0;
+
+          res.on('data', (chunk) => {
+            downloadedBytes += chunk.length;
+            if (totalBytes > 0) {
+              const percent = Math.min(100, Math.round((downloadedBytes / totalBytes) * 100));
+              safeSend('updater:progress', { percent, downloadedBytes, totalBytes });
+            }
+          });
+
+          res.pipe(file);
+
+          file.on('finish', () => {
+            file.close(() => resolve(dest));
+          });
+        });
+
+        req.on('error', (err) => {
+          file.close();
+          try { fs.unlinkSync(dest); } catch {}
+          reject(err);
+        });
+      });
+    };
+
+    const downloadedPath = await downloadFile(downloadUrl, targetPath);
+
+    if (downloadedPath.endsWith('.exe')) {
+      spawn(downloadedPath, [], { detached: true, stdio: 'ignore' }).unref();
+      setTimeout(() => {
+        isQuitting = true;
+        app.quit();
+      }, 500);
+      return { success: true };
+    } else {
+      const { shell } = require('electron');
+      shell.showItemInFolder(downloadedPath);
+      return { success: true, openedFolder: true };
+    }
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
 });
 
 function startIdleMonitor() {
