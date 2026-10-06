@@ -1,9 +1,10 @@
-const { app, BrowserWindow, Menu, ipcMain, powerMonitor, Tray, nativeImage } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, powerMonitor, Tray, nativeImage, dialog, Notification } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
 const { spawn } = require('child_process');
 const DiscordClient = require('./discord/client');
+const { findLocalDiscordTokens } = require('./discord/tokenFinder');
 
 Menu.setApplicationMenu(null);
 
@@ -120,6 +121,52 @@ function bindClientEvents(client) {
 
   client.on('queue-joined', (data) => {
     safeSend('discord:queue-joined', data);
+
+    if (currentSettings.desktopNotifications !== false && Notification.isSupported()) {
+      try {
+        const icoPath = path.join(__dirname, 'assets', 'icon.ico');
+        const pngPath = path.join(__dirname, 'assets', 'qPilot-app-logo.png');
+        const iconPath = (process.platform === 'win32' && fs.existsSync(icoPath)) ? icoPath : pngPath;
+        new Notification({
+          title: 'Joined Queue!',
+          body: `Successfully entered ${data.guildName || 'Waitlist'} (${data.region || data.channelName || 'Queue'}) in ${data.latencyMs || 0}ms`,
+          icon: iconPath,
+        }).show();
+      } catch (e) {}
+    }
+
+    if (currentSettings.webhookUrl && currentSettings.webhookUrl.startsWith('https://discord.com/api/webhooks/')) {
+      try {
+        const url = new URL(currentSettings.webhookUrl);
+        const payload = JSON.stringify({
+          username: 'qPilot',
+          avatar_url: 'https://cdn.discordapp.com/embed/avatars/0.png',
+          embeds: [{
+            title: '🎯 Successfully Entered Queue!',
+            description: `Joined **${data.guildName || 'Waitlist'}** - \`#${data.channelName || 'queue'}\` [${data.region || 'WAITLIST'}]`,
+            fields: [
+              { name: 'Latency', value: `${data.latencyMs || 0} ms`, inline: true },
+              { name: 'Clicks', value: `${data.clicks || 1}`, inline: true },
+              { name: 'Account', value: data.accountName || 'Discord', inline: true },
+            ],
+            color: 3858688,
+            timestamp: new Date().toISOString()
+          }]
+        });
+        const req = https.request({
+          hostname: url.hostname,
+          path: url.pathname + url.search,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(payload)
+          }
+        });
+        req.on('error', () => {});
+        req.write(payload);
+        req.end();
+      } catch (e) {}
+    }
   });
 
   client.on('error', (data) => {
@@ -302,6 +349,14 @@ let currentSettings = {
   pauseOnIdle: true,
   idleThresholdMinutes: 5,
   minimizeToTray: true,
+  launchOnStartup: false,
+  desktopNotifications: true,
+  soundEnabled: true,
+  soundType: 'default',
+  soundPath: '',
+  soundUrl: '',
+  soundVolume: 80,
+  webhookUrl: '',
 };
 let isIdlePaused = false;
 let queuePauseUntil = 0;
@@ -403,6 +458,14 @@ ipcMain.handle('discord:disarmChannel', async (event, { accountId, channelId }) 
 ipcMain.handle('discord:updateSettings', async (event, payload) => {
   const settings = payload?.settings || payload;
   currentSettings = Object.assign(currentSettings, settings);
+  if (typeof settings.launchOnStartup === 'boolean') {
+    try {
+      app.setLoginItemSettings({
+        openAtLogin: settings.launchOnStartup,
+        path: process.execPath,
+      });
+    } catch (e) {}
+  }
   const accountId = payload?.accountId;
   if (accountId && clients.has(accountId)) {
     clients.get(accountId).updateSettings(settings);
@@ -470,6 +533,114 @@ ipcMain.handle('discord:removeCustomTarget', async (event, { channelId }) => {
 ipcMain.handle('discord:getCustomTargets', async () => {
   const store = readStore();
   return store.customTargets || [];
+});
+
+ipcMain.handle('discord:autoFetchTokens', async () => {
+  try {
+    const accounts = await findLocalDiscordTokens();
+    return { success: true, accounts };
+  } catch (err) {
+    return { success: false, error: err.message, accounts: [] };
+  }
+});
+
+ipcMain.handle('system:getAutoLaunch', () => {
+  try {
+    return { enabled: app.getLoginItemSettings().openAtLogin };
+  } catch (e) {
+    return { enabled: false };
+  }
+});
+
+ipcMain.handle('system:setAutoLaunch', (event, { enable }) => {
+  try {
+    app.setLoginItemSettings({
+      openAtLogin: !!enable,
+      path: process.execPath,
+    });
+    return { success: true, enabled: !!enable };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('dialog:openAudioFile', async () => {
+  try {
+    const res = await dialog.showOpenDialog(mainWindow, {
+      title: 'Select Alert Sound File',
+      properties: ['openFile'],
+      filters: [
+        { name: 'Audio Files (*.mp3;*.wav;*.ogg)', extensions: ['mp3', 'wav', 'ogg'] },
+        { name: 'All Files (*.*)', extensions: ['*'] }
+      ]
+    });
+    if (res.canceled || !res.filePaths || res.filePaths.length === 0) {
+      return { canceled: true };
+    }
+    return { canceled: false, filePath: res.filePaths[0] };
+  } catch (err) {
+    return { canceled: true, error: err.message };
+  }
+});
+
+ipcMain.handle('system:notify', (event, { title, body }) => {
+  try {
+    if (Notification.isSupported()) {
+      const icoPath = path.join(__dirname, 'assets', 'icon.ico');
+      const pngPath = path.join(__dirname, 'assets', 'qPilot-app-logo.png');
+      const iconPath = (process.platform === 'win32' && fs.existsSync(icoPath)) ? icoPath : pngPath;
+      new Notification({
+        title: title || 'qPilot',
+        body: body || '',
+        icon: iconPath,
+      }).show();
+      return { success: true };
+    }
+    return { success: false, error: 'Notifications not supported' };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('discord:testWebhook', async (event, { webhookUrl }) => {
+  if (!webhookUrl || !webhookUrl.startsWith('https://discord.com/api/webhooks/')) {
+    return { success: false, error: 'Invalid Discord webhook URL' };
+  }
+  try {
+    const url = new URL(webhookUrl);
+    const payload = JSON.stringify({
+      username: 'qPilot Alerts',
+      avatar_url: 'https://cdn.discordapp.com/embed/avatars/0.png',
+      embeds: [{
+        title: '🔔 Test Notification',
+        description: 'Your qPilot webhook alert is working properly!',
+        color: 3717112,
+        timestamp: new Date().toISOString()
+      }]
+    });
+    return new Promise((resolve) => {
+      const req = https.request({
+        hostname: url.hostname,
+        path: url.pathname + url.search,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload)
+        }
+      }, (res) => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve({ success: true });
+        } else {
+          resolve({ success: false, error: `Discord returned HTTP ${res.statusCode}` });
+        }
+      });
+      req.on('error', (e) => resolve({ success: false, error: e.message }));
+      req.write(payload);
+      req.end();
+    });
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
 });
 
 const GITHUB_REPO = 'kiynetic/tierlist-queue-sniper';

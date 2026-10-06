@@ -1915,125 +1915,449 @@
       transform: none;
     }
 
-    .drawer-backdrop {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(3, 3, 7, 0.72);
-      backdrop-filter: blur(12px) saturate(1.2);
-      -webkit-backdrop-filter: blur(12px) saturate(1.2);
-      z-index: 1400;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.32s ease;
-    }
-
-    .drawer-backdrop.open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .settings-drawer {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: 380px;
-      background: #101016;
-      border-left: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: -16px 0 50px rgba(0, 0, 0, 0.8), -1px 0 0 rgba(255, 255, 255, 0.04);
-      z-index: 1500;
+    .settings-page-view {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
-      transform: translateX(100%);
-      transition: transform 0.36s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.36s ease;
     }
 
-    .settings-drawer.open {
-      transform: translateX(0);
+    .settings-page-view::-webkit-scrollbar {
+      width: 6px;
     }
 
-    .settings-drawer.open .setting-group {
-      animation: drawerItemEnter 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-    .settings-drawer.open .setting-group:nth-child(1) { animation-delay: 0.06s; }
-    .settings-drawer.open .setting-group:nth-child(2) { animation-delay: 0.11s; }
-    .settings-drawer.open .setting-group:nth-child(3) { animation-delay: 0.16s; }
-    .settings-drawer.open .setting-group:nth-child(4) { animation-delay: 0.21s; }
-    .settings-drawer.open .setting-group:nth-child(5) { animation-delay: 0.26s; }
-
-    @keyframes drawerItemEnter {
-      0% {
-        opacity: 0;
-        transform: translateX(16px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateX(0);
-      }
+    .settings-page-view::-webkit-scrollbar-track {
+      background: transparent;
     }
 
-    .drawer-header {
-      padding: 20px 24px;
+    .settings-page-view::-webkit-scrollbar-thumb {
+      background: #1e1e2c;
+      border-radius: 10px;
+    }
+
+    .settings-page-view::-webkit-scrollbar-thumb:hover {
+      background: #323248;
+    }
+
+    .settings-page-container {
+      max-width: 1080px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 28px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      box-sizing: border-box;
+    }
+
+    .settings-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .settings-card {
+      background: #0f1017;
+      border: 1px solid #1c1d2a;
+      border-radius: 18px;
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .settings-card:hover {
+      border-color: #282a3c;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .settings-card-full {
+      grid-column: 1 / -1;
+    }
+
+    .settings-card-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    .drawer-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-white);
+    .settings-card-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
-    .drawer-close-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: 8px;
+    .settings-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.2px;
+    }
+
+    .settings-card-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .settings-card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      flex: 1;
+    }
+
+    .setting-card-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.05);
+      margin: 2px 0;
+    }
+
+    .setting-card-hint {
+      font-size: 11.5px;
+      color: #727284;
+      line-height: 1.45;
+      margin-top: 2px;
+    }
+
+    .settings-alert-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .alert-subcard {
+      background: #141520;
+      border: 1px solid #202232;
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sound-mode-selector {
+      display: flex;
+      gap: 6px;
+      background: #0b0c12;
+      border: 1px solid #1e202e;
+      border-radius: 10px;
+      padding: 3px;
+    }
+
+    .sound-mode-btn {
+      flex: 1;
+      padding: 6px 10px;
+      border-radius: 7px;
       background: transparent;
-      border: 1px solid transparent;
-      color: #88889a;
-      font-size: 16px;
+      border: none;
+      color: #8a8a9c;
+      font-size: 11.5px;
+      font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
       transition: all 0.15s ease;
+      font-family: var(--font-family);
+      user-select: none;
     }
 
-    .drawer-close-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.06);
+    .sound-mode-btn:hover {
       color: #ffffff;
     }
 
-    .drawer-body {
+    .sound-mode-btn.active {
+      background: #1f2234;
+      color: #38bdf8;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .sound-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .settings-text-input {
       flex: 1;
-      padding: 24px;
+      height: 36px;
+      background: #0d0e14;
+      border: 1px solid #202334;
+      border-radius: 9px;
+      padding: 0 12px;
+      font-size: 12px;
+      color: #ffffff;
+      outline: none;
+      font-family: var(--font-family);
+      transition: border-color 0.18s ease;
+      box-sizing: border-box;
+    }
+
+    .settings-text-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .btn-settings-browse {
+      height: 36px;
+      padding: 0 14px;
+      background: #181a28;
+      border: 1px solid #2b2e44;
+      border-radius: 9px;
+      color: #d1d5db;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      font-family: var(--font-family);
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .btn-settings-browse:hover {
+      background: #202438;
+      color: #ffffff;
+      border-color: #3a3f5c;
+    }
+
+    .btn-settings-action {
+      height: 32px;
+      padding: 0 12px;
+      background: #151724;
+      border: 1px solid #24273c;
+      border-radius: 8px;
+      color: #9ca3af;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      font-family: var(--font-family);
+      user-select: none;
+    }
+
+    .btn-settings-action:hover {
+      background: #1d2032;
+      color: #ffffff;
+      border-color: #383c5a;
+    }
+
+    .settings-reset-btn {
+      height: 34px;
+      padding: 0 14px;
+      background: transparent;
+      border: 1px solid #242636;
+      border-radius: 9px;
+      color: #8a8a9a;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      font-family: var(--font-family);
+      user-select: none;
+    }
+
+    .settings-reset-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+
+    .settings-page-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 8px;
+    }
+
+    .settings-footer-note {
+      font-size: 11.5px;
+      color: #656578;
+    }
+
+    .login-autofetch-btn {
+      width: 100%;
+      height: 48px;
+      background: linear-gradient(135deg, #5865F2 0%, #4752C4 100%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      box-shadow: 0 4px 18px rgba(88, 101, 242, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: var(--font-family);
+      user-select: none;
+      margin-bottom: 14px;
+    }
+
+    .login-autofetch-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #6774f8 0%, #515dd4 100%);
+      box-shadow: 0 6px 24px rgba(88, 101, 242, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .login-autofetch-btn:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .login-autofetch-btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .autofetch-btn-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .autofetch-badge {
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .autofetch-results-wrap {
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 8px;
+      margin-bottom: 14px;
+      max-height: 185px;
       overflow-y: auto;
+      padding-right: 6px;
+      animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .drawer-body::-webkit-scrollbar {
-      width: 6px;
+    .autofetch-results-wrap::-webkit-scrollbar {
+      width: 5px;
     }
 
-    .drawer-body::-webkit-scrollbar-track {
-      background: #09090d;
+    .autofetch-results-wrap::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 999px;
     }
 
-    .drawer-body::-webkit-scrollbar-thumb {
-      background: #262638;
+    .autofetch-results-wrap::-webkit-scrollbar-thumb {
+      background: #25283d;
+      border-radius: 999px;
+    }
+
+    .autofetch-results-wrap::-webkit-scrollbar-thumb:hover {
+      background: #3c4164;
+    }
+
+    .autofetch-account-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #141520;
+      border: 1px solid #232538;
+      border-radius: 12px;
+      padding: 10px 14px;
+      transition: all 0.15s ease;
+    }
+
+    .autofetch-account-card:hover {
+      border-color: #383c5a;
+      background: #181a28;
+    }
+
+    .autofetch-account-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .autofetch-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #222436;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .autofetch-account-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .autofetch-username {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .autofetch-source-tag {
+      font-size: 10.5px;
+      color: #8b8ea4;
+    }
+
+    .autofetch-connect-btn {
+      padding: 6px 14px;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      font-family: var(--font-family);
+    }
+
+    .autofetch-connect-btn:hover {
+      background: linear-gradient(135deg, #7174ff 0%, #584feb 100%);
+      transform: translateY(-1px);
+    }
+
+    .autofetch-empty {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
       border-radius: 10px;
-    }
-
-    .drawer-body::-webkit-scrollbar-thumb:hover {
-      background: #444462;
+      padding: 10px 14px;
+      font-size: 11.5px;
+      color: #f87171;
+      margin-bottom: 12px;
     }
 
     .custom-field-group {
@@ -2199,6 +2523,7 @@
       width: 940px;
       max-width: 95vw;
       min-height: 570px;
+      max-height: calc(100vh - 48px);
       background: rgba(15, 16, 25, 0.92);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 24px;
@@ -2317,13 +2642,31 @@
     .login-right {
       flex: 1;
       min-width: 0;
-      padding: 44px 40px;
+      padding: 38px 40px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       background: #0f0f15;
       box-sizing: border-box;
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .login-right::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .login-right::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .login-right::-webkit-scrollbar-thumb {
+      background: #25283d;
+      border-radius: 999px;
+    }
+
+    .login-right::-webkit-scrollbar-thumb:hover {
+      background: #3c4164;
     }
 
     .login-category-tag {
@@ -3048,7 +3391,7 @@
 
     <main class="app-main">
 
-      <header class="main-header">
+      <header class="main-header" id="waitlistsHeader">
         <div class="header-text-group">
           <h1 class="header-main-title">Waitlists</h1>
           <p class="header-main-desc">Monitor your favorite servers and get into queues instantly.</p>
@@ -3081,6 +3424,24 @@
           <button class="add-server-btn" onclick="openAddCustomModal()">
             <i class="ph ph-plus" style="font-size: 14px;"></i>
             <span>Add server</span>
+          </button>
+        </div>
+      </header>
+
+      <header class="main-header" id="settingsHeader" style="display: none;">
+        <div class="header-text-group">
+          <h1 class="header-main-title">Settings</h1>
+          <p class="header-main-desc">Configure click rate, queue protection, audio alerts, and system startup.</p>
+        </div>
+
+        <div class="header-controls-group">
+          <button class="settings-reset-btn" onclick="resetSettingsToDefault()" title="Reset settings to defaults">
+            <i class="ph ph-arrow-counter-clockwise" style="font-size: 13px;"></i>
+            <span>Reset defaults</span>
+          </button>
+          <button class="save-settings-btn" id="headerSaveSettingsBtn" onclick="saveSettings()">
+            <i class="ph ph-check" style="font-size: 14px;"></i>
+            <span>Save changes</span>
           </button>
         </div>
       </header>
@@ -3138,155 +3499,344 @@
         </button>
       </div>
 
+      <div class="settings-page-view" id="settingsPageView" style="display: none;">
+        <div class="settings-page-container">
+
+          <div class="settings-cards-grid">
+
+            <div class="settings-card">
+              <div class="settings-card-header">
+                <div class="settings-card-icon-wrap" style="color: #6366f1;">
+                  <i class="ph ph-lightning" style="font-size: 18px;"></i>
+                </div>
+                <div>
+                  <div class="settings-card-title">Sniping Engine</div>
+                  <div class="settings-card-subtitle">Tune click burst intensity and rate limits</div>
+                </div>
+              </div>
+
+              <div class="settings-card-body">
+                <div class="setting-group">
+                  <div class="setting-row-top">
+                    <span class="setting-label">Clicks per second</span>
+                    <span class="setting-badge" id="badgeCps">100/s</span>
+                  </div>
+                  <div class="slider-track-wrap">
+                    <input type="range" class="custom-range" id="sliderCps" min="1" max="100" step="1" value="100" oninput="updateSettingsUI()">
+                    <div class="slider-limits">
+                      <span>1/s</span>
+                      <span>100/s</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="setting-group">
+                  <div class="setting-row-top">
+                    <span class="setting-label">Burst duration</span>
+                    <span class="setting-badge" id="badgeBurst">3.0 s</span>
+                  </div>
+                  <div class="slider-track-wrap">
+                    <input type="range" class="custom-range" id="sliderBurst" min="0.1" max="10" step="0.1" value="3" oninput="updateSettingsUI()">
+                    <div class="slider-limits">
+                      <span>0.1 s</span>
+                      <span>10 s</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="setting-group">
+                  <div class="setting-row-top">
+                    <span class="setting-label">Burst cooldown timeout</span>
+                    <span class="setting-badge" id="badgeCooldown">60 s</span>
+                  </div>
+                  <div class="slider-track-wrap">
+                    <input type="range" class="custom-range" id="sliderCooldown" min="5" max="300" step="1" value="60" oninput="updateSettingsUI()">
+                    <div class="slider-limits">
+                      <span>5 s</span>
+                      <span>300 s</span>
+                    </div>
+                  </div>
+                </div>
+
+                <p class="setting-card-hint">
+                  Each queue announcement button receives one burst of clicks at the configured frequency.
+                </p>
+              </div>
+            </div>
+
+            <div class="settings-card">
+              <div class="settings-card-header">
+                <div class="settings-card-icon-wrap" style="color: #38bdf8;">
+                  <i class="ph ph-shield-check" style="font-size: 18px;"></i>
+                </div>
+                <div>
+                  <div class="settings-card-title">Queue Protection</div>
+                  <div class="settings-card-subtitle">Safety locks when entering queues or idle</div>
+                </div>
+              </div>
+
+              <div class="settings-card-body">
+                <div class="setting-toggle-row">
+                  <div class="setting-toggle-info">
+                    <span class="setting-label">Pause other tierlists after joining</span>
+                    <span class="setting-sublabel">Temporarily pauses all queues once you enter one to protect your spot</span>
+                  </div>
+                  <label class="switch-small">
+                    <input type="checkbox" id="checkPauseAfterJoin" checked onchange="updateSettingsUI()">
+                    <span class="slider-small"></span>
+                  </label>
+                </div>
+
+                <div class="setting-group" id="groupPauseDuration">
+                  <div class="setting-row-top">
+                    <span class="setting-label">Pause protection duration</span>
+                    <span class="setting-badge" id="badgePauseDuration">60 min (1 hr)</span>
+                  </div>
+                  <div class="slider-track-wrap">
+                    <input type="range" class="custom-range" id="sliderPauseDuration" min="5" max="240" step="5" value="60" oninput="updateSettingsUI()">
+                    <div class="slider-limits">
+                      <span>5 min</span>
+                      <span>4 hrs</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="setting-card-divider"></div>
+
+                <div class="setting-toggle-row">
+                  <div class="setting-toggle-info">
+                    <span class="setting-label">Pause sniping when PC is idle</span>
+                    <span class="setting-sublabel">Suspends queue clicks when mouse or keyboard activity ceases</span>
+                  </div>
+                  <label class="switch-small">
+                    <input type="checkbox" id="checkPauseOnIdle" checked onchange="updateSettingsUI()">
+                    <span class="slider-small"></span>
+                  </label>
+                </div>
+
+                <div class="setting-group" id="groupIdleThreshold">
+                  <div class="setting-row-top">
+                    <span class="setting-label">Idle timeout threshold</span>
+                    <span class="setting-badge" id="badgeIdleThreshold">5 min</span>
+                  </div>
+                  <div class="slider-track-wrap">
+                    <input type="range" class="custom-range" id="sliderIdleThreshold" min="1" max="60" step="1" value="5" oninput="updateSettingsUI()">
+                    <div class="slider-limits">
+                      <span>1 min</span>
+                      <span>60 min</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-card settings-card-full">
+              <div class="settings-card-header">
+                <div class="settings-card-icon-wrap" style="color: #f59e0b;">
+                  <i class="ph ph-bell-ringing" style="font-size: 18px;"></i>
+                </div>
+                <div>
+                  <div class="settings-card-title">Instant Alerts & Audio</div>
+                  <div class="settings-card-subtitle">Desktop banners, custom sound effects, and Discord webhook pings</div>
+                </div>
+              </div>
+
+              <div class="settings-card-body">
+                <div class="settings-alert-grid">
+
+                  <div class="alert-subcard">
+                    <div class="setting-toggle-row">
+                      <div class="setting-toggle-info">
+                        <span class="setting-label">Desktop Notifications</span>
+                        <span class="setting-sublabel">Native Windows alert banners when you successfully join a queue</span>
+                      </div>
+                      <label class="switch-small">
+                        <input type="checkbox" id="checkDesktopNotifications" checked onchange="updateSettingsUI()">
+                        <span class="slider-small"></span>
+                      </label>
+                    </div>
+
+                    <div style="margin-top: 14px;">
+                      <button type="button" class="btn-settings-action" onclick="testDesktopNotification()">
+                        <i class="ph ph-paper-plane-tilt" style="font-size: 13px;"></i>
+                        <span>Send test notification</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="alert-subcard">
+                    <div class="setting-toggle-row">
+                      <div class="setting-toggle-info">
+                        <span class="setting-label">Sound Alert on Join</span>
+                        <span class="setting-sublabel">Play audio effect when a queue button is clicked & joined</span>
+                      </div>
+                      <label class="switch-small">
+                        <input type="checkbox" id="checkSoundEnabled" checked onchange="updateSettingsUI()">
+                        <span class="slider-small"></span>
+                      </label>
+                    </div>
+
+                    <div id="soundControlsWrap" style="margin-top: 14px; display: flex; flex-direction: column; gap: 12px;">
+                      <div>
+                        <div class="setting-label" style="font-size: 12px; margin-bottom: 6px;">Sound source</div>
+                        <div class="sound-mode-selector">
+                          <button type="button" class="sound-mode-btn active" id="btnSoundDefault" onclick="selectSoundMode('default')">
+                            <i class="ph ph-music-note"></i>
+                            <span>Chime (Preset)</span>
+                          </button>
+                          <button type="button" class="sound-mode-btn" id="btnSoundFile" onclick="selectSoundMode('custom_file')">
+                            <i class="ph ph-folder-open"></i>
+                            <span>Custom File</span>
+                          </button>
+                          <button type="button" class="sound-mode-btn" id="btnSoundUrl" onclick="selectSoundMode('custom_url')">
+                            <i class="ph ph-link"></i>
+                            <span>Sound URL</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div id="soundFileRow" style="display: none;">
+                        <div class="sound-input-row">
+                          <input type="text" id="inputSoundPath" class="settings-text-input" placeholder="No file selected..." readonly>
+                          <button type="button" class="btn-settings-browse" onclick="browseAudioFile()">
+                            <i class="ph ph-upload-simple"></i>
+                            <span>Browse (.mp3, .wav, .ogg)</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div id="soundUrlRow" style="display: none;">
+                        <input type="text" id="inputSoundUrl" class="settings-text-input" placeholder="https://example.com/sound.mp3" oninput="updateSettingsUI()">
+                      </div>
+
+                      <div class="setting-group" style="margin-top: 4px;">
+                        <div class="setting-row-top">
+                          <span class="setting-label" style="font-size: 12px;">Alert volume</span>
+                          <span class="setting-badge" id="badgeSoundVolume">80%</span>
+                        </div>
+                        <div class="slider-track-wrap">
+                          <input type="range" class="custom-range" id="sliderSoundVolume" min="0" max="100" step="5" value="80" oninput="updateSettingsUI()">
+                          <div class="slider-limits">
+                            <span>Mute</span>
+                            <span>100%</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <button type="button" class="btn-settings-action" onclick="testAlertSound()">
+                          <i class="ph ph-speaker-high" style="font-size: 13px;"></i>
+                          <span>Preview sound alert</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="setting-card-divider" style="margin: 18px 0;"></div>
+
+                <div class="webhook-config-group">
+                  <div class="setting-row-top">
+                    <div class="setting-toggle-info">
+                      <span class="setting-label">Discord Webhook Ping (Optional)</span>
+                      <span class="setting-sublabel">Send real-time queue join pings directly to your personal Discord server or channel</span>
+                    </div>
+                  </div>
+                  <div class="sound-input-row" style="margin-top: 10px;">
+                    <input type="text" id="inputWebhookUrl" class="settings-text-input" placeholder="https://discord.com/api/webhooks/..." oninput="updateSettingsUI()">
+                    <button type="button" class="btn-settings-action" onclick="testDiscordWebhook()" style="white-space: nowrap;">
+                      <i class="ph ph-paper-plane-right" style="font-size: 13px;"></i>
+                      <span>Test webhook</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-card">
+              <div class="settings-card-header">
+                <div class="settings-card-icon-wrap" style="color: #a855f7;">
+                  <i class="ph ph-desktop" style="font-size: 18px;"></i>
+                </div>
+                <div>
+                  <div class="settings-card-title">System & Startup</div>
+                  <div class="settings-card-subtitle">Windows boot and tray background behavior</div>
+                </div>
+              </div>
+
+              <div class="settings-card-body">
+                <div class="setting-toggle-row">
+                  <div class="setting-toggle-info">
+                    <span class="setting-label">Launch on Windows startup</span>
+                    <span class="setting-sublabel">Automatically launches qPilot in background when your PC boots</span>
+                  </div>
+                  <label class="switch-small">
+                    <input type="checkbox" id="checkLaunchOnStartup" onchange="toggleLaunchOnStartup(this.checked)">
+                    <span class="slider-small"></span>
+                  </label>
+                </div>
+
+                <div class="setting-card-divider"></div>
+
+                <div class="setting-toggle-row">
+                  <div class="setting-toggle-info">
+                    <span class="setting-label">Minimize to System Tray</span>
+                    <span class="setting-sublabel">Closing the window hides qPilot to the system tray while continuing to snipe</span>
+                  </div>
+                  <label class="switch-small">
+                    <input type="checkbox" id="checkMinimizeToTray" checked onchange="updateSettingsUI()">
+                    <span class="slider-small"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-card">
+              <div class="settings-card-header">
+                <div class="settings-card-icon-wrap" style="color: #10b981;">
+                  <i class="ph ph-arrows-clockwise" style="font-size: 18px;"></i>
+                </div>
+                <div>
+                  <div class="settings-card-title">Application Updates</div>
+                  <div class="settings-card-subtitle">GitHub Releases integration and version checks</div>
+                </div>
+              </div>
+
+              <div class="settings-card-body">
+                <div class="update-settings-row" style="margin-top: 0;">
+                  <div class="update-settings-left">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="setting-label">qPilot Version</span>
+                      <span class="update-badge-pill" id="settingsCurrentVersionPill">v1.0.0</span>
+                    </div>
+                    <span class="setting-sublabel" id="settingsUpdateStatusText">You are on the latest version</span>
+                  </div>
+                  <button class="btn-update-secondary" id="btnSettingsCheckUpdates" onclick="manualCheckForUpdates()" style="padding: 6px 14px; font-size: 11.5px;">
+                    <i class="ph ph-arrows-clockwise" style="font-size: 13px;"></i>
+                    <span>Check now</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="settings-page-footer">
+            <div class="settings-footer-note">Settings are persisted locally and encrypted on your device.</div>
+            <div style="display: flex; gap: 10px;">
+              <button class="settings-reset-btn" onclick="resetSettingsToDefault()">Reset defaults</button>
+              <button class="save-settings-btn" onclick="saveSettings()">
+                <i class="ph ph-check"></i>
+                <span>Save changes</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </main>
-
-    <div class="drawer-backdrop" id="drawerBackdrop" onclick="toggleSettingsDrawer(false)"></div>
-
-    <div class="settings-drawer" id="settingsDrawer">
-      <div class="drawer-header">
-        <div class="drawer-title">Click settings</div>
-        <button class="drawer-close-btn" onclick="toggleSettingsDrawer(false)"><i class="ph ph-x"></i></button>
-      </div>
-
-      <div class="drawer-body">
-        <div class="setting-group">
-          <div class="setting-row-top">
-            <span class="setting-label">Clicks per second</span>
-            <span class="setting-badge" id="badgeCps">100/s</span>
-          </div>
-          <div class="slider-track-wrap">
-            <input type="range" class="custom-range" id="sliderCps" min="1" max="100" step="1" value="100" oninput="updateSettingsUI()">
-            <div class="slider-limits">
-              <span>1</span>
-              <span>100</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="setting-group">
-          <div class="setting-row-top">
-            <span class="setting-label">Burst length</span>
-            <span class="setting-badge" id="badgeBurst">3.0 s</span>
-          </div>
-          <div class="slider-track-wrap">
-            <input type="range" class="custom-range" id="sliderBurst" min="0.1" max="10" step="0.1" value="3" oninput="updateSettingsUI()">
-            <div class="slider-limits">
-              <span>0.1 s</span>
-              <span>10 s</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="setting-group">
-          <div class="setting-row-top">
-            <span class="setting-label">Cooldown after a burst</span>
-            <span class="setting-badge" id="badgeCooldown">60 s</span>
-          </div>
-          <div class="slider-track-wrap">
-            <input type="range" class="custom-range" id="sliderCooldown" min="5" max="300" step="1" value="60" oninput="updateSettingsUI()">
-            <div class="slider-limits">
-              <span>5 s</span>
-              <span>300 s</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="setting-divider"></div>
-        <div class="setting-section-title">Queue Protection</div>
-
-        <div class="setting-toggle-row">
-          <div class="setting-toggle-info">
-            <span class="setting-label">Pause other tierlists after joining</span>
-            <span class="setting-sublabel">Temporarily pauses all queues once you enter one</span>
-          </div>
-          <label class="switch-small">
-            <input type="checkbox" id="checkPauseAfterJoin" checked onchange="updateSettingsUI()">
-            <span class="slider-small"></span>
-          </label>
-        </div>
-
-        <div class="setting-group" id="groupPauseDuration">
-          <div class="setting-row-top">
-            <span class="setting-label">Pause cooldown duration</span>
-            <span class="setting-badge" id="badgePauseDuration">60 min (1 hr)</span>
-          </div>
-          <div class="slider-track-wrap">
-            <input type="range" class="custom-range" id="sliderPauseDuration" min="5" max="240" step="5" value="60" oninput="updateSettingsUI()">
-            <div class="slider-limits">
-              <span>5 min</span>
-              <span>4 hrs</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="setting-divider"></div>
-        <div class="setting-section-title">Idle Detection</div>
-
-        <div class="setting-toggle-row">
-          <div class="setting-toggle-info">
-            <span class="setting-label">Pause sniping when PC is idle</span>
-            <span class="setting-sublabel">Pauses queue joining when no mouse or keyboard input is detected</span>
-          </div>
-          <label class="switch-small">
-            <input type="checkbox" id="checkPauseOnIdle" checked onchange="updateSettingsUI()">
-            <span class="slider-small"></span>
-          </label>
-        </div>
-
-        <div class="setting-group" id="groupIdleThreshold">
-          <div class="setting-row-top">
-            <span class="setting-label">Idle timeout threshold</span>
-            <span class="setting-badge" id="badgeIdleThreshold">5 min</span>
-          </div>
-          <div class="slider-track-wrap">
-            <input type="range" class="custom-range" id="sliderIdleThreshold" min="1" max="60" step="1" value="5" oninput="updateSettingsUI()">
-            <div class="slider-limits">
-              <span>1 min</span>
-              <span>60 min</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="setting-divider"></div>
-        <div class="setting-section-title">System & Background</div>
-
-        <div class="setting-toggle-row">
-          <div class="setting-toggle-info">
-            <span class="setting-label">Minimize to System Tray</span>
-            <span class="setting-sublabel">Closing the window hides qPilot to the system tray while continuing to snipe</span>
-          </div>
-          <label class="switch-small">
-            <input type="checkbox" id="checkMinimizeToTray" checked onchange="updateSettingsUI()">
-            <span class="slider-small"></span>
-          </label>
-        </div>
-
-        <div class="setting-divider"></div>
-        <div class="setting-section-title">Application Updates</div>
-
-        <div class="update-settings-row">
-          <div class="update-settings-left">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="setting-label">qPilot Version</span>
-              <span class="update-badge-pill" id="settingsCurrentVersionPill">v1.0.0</span>
-            </div>
-            <span class="setting-sublabel" id="settingsUpdateStatusText">You are on the latest version</span>
-          </div>
-          <button class="btn-update-secondary" id="btnSettingsCheckUpdates" onclick="manualCheckForUpdates()" style="padding: 6px 14px; font-size: 11.5px;">
-            <i class="ph ph-arrows-clockwise" style="font-size: 13px;"></i>
-            <span>Check now</span>
-          </button>
-        </div>
-
-        <p class="setting-explanation">
-          Each queue message gets one burst of clicks at the set rate. Once joined or once the burst duration ends, clicks immediately stop and enforce the cooldown timeout.
-        </p>
-      </div>
-
-      <div class="drawer-footer">
-        <button class="save-settings-btn" onclick="saveSettings()">Save changes</button>
-      </div>
-    </div>
 
     <div class="modal-backdrop" id="queueEnteredModal" style="display: none;" onclick="closeQueueModalOnBackdrop(event)">
       <div class="modal-card queue-entered-card">
@@ -3394,6 +3944,24 @@
         </div>
 
         <div class="modal-body">
+          <button type="button" class="login-autofetch-btn" id="modalAutoDetectBtn" onclick="triggerAutoDetectModal()" style="margin-bottom: 12px;">
+            <div class="autofetch-btn-left">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
+                <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+              </svg>
+              <span id="modalAutoDetectBtnText">Auto-detect Discord Account</span>
+            </div>
+            <div class="autofetch-badge">1-Click</div>
+          </button>
+
+          <div class="autofetch-results-wrap" id="modalAutoDetectResults" style="display: none;"></div>
+
+          <div class="login-divider-row" style="margin: 12px 0 14px;">
+            <div class="login-divider-line"></div>
+            <div class="login-divider-text">OR ENTER MANUALLY</div>
+            <div class="login-divider-line"></div>
+          </div>
+
           <div class="login-input-group">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#5865F2" style="flex-shrink: 0; margin-right: 2px;">
               <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
@@ -3579,7 +4147,25 @@
         <div class="login-right">
           <div class="login-category-tag">GET STARTED</div>
           <h1 class="login-heading">Connect your Discord</h1>
-          <p class="login-subheading">Paste your Discord user token to automatically monitor and snipe MCTiers and PvPTiers queues.</p>
+          <p class="login-subheading">Auto-detect your active Discord desktop session or paste your token manually below.</p>
+
+          <button type="button" class="login-autofetch-btn" id="loginAutoDetectBtn" onclick="triggerAutoDetectLogin()">
+            <div class="autofetch-btn-left">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff">
+                <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+              </svg>
+              <span id="loginAutoDetectBtnText">Auto-detect from Discord</span>
+            </div>
+            <div class="autofetch-badge">1-Click</div>
+          </button>
+
+          <div class="autofetch-results-wrap" id="loginAutoDetectResults" style="display: none;"></div>
+
+          <div class="login-divider-row" style="margin: 14px 0 16px;">
+            <div class="login-divider-line"></div>
+            <div class="login-divider-text">OR ENTER MANUALLY</div>
+            <div class="login-divider-line"></div>
+          </div>
 
           <label class="login-input-label">DISCORD ACCOUNT TOKEN</label>
           <div class="token-input-wrapper">
@@ -3659,6 +4245,15 @@
         pauseDurationMinutes: 60,
         pauseOnIdle: true,
         idleThresholdMinutes: 5,
+        minimizeToTray: true,
+        launchOnStartup: false,
+        desktopNotifications: true,
+        soundEnabled: true,
+        soundType: 'default',
+        soundPath: '',
+        soundUrl: '',
+        soundVolume: 80,
+        webhookUrl: '',
         ignoredUpdateVersion: null,
       },
       availableUpdate: null,
@@ -3725,6 +4320,36 @@
     if (document.getElementById('checkMinimizeToTray')) {
       document.getElementById('checkMinimizeToTray').checked = state.settings.minimizeToTray !== false;
     }
+    if (document.getElementById('checkDesktopNotifications')) {
+      document.getElementById('checkDesktopNotifications').checked = state.settings.desktopNotifications !== false;
+    }
+    if (document.getElementById('checkSoundEnabled')) {
+      document.getElementById('checkSoundEnabled').checked = state.settings.soundEnabled !== false;
+    }
+    if (document.getElementById('sliderSoundVolume')) {
+      document.getElementById('sliderSoundVolume').value = typeof state.settings.soundVolume === 'number' ? state.settings.soundVolume : 80;
+    }
+    if (document.getElementById('inputSoundPath')) {
+      document.getElementById('inputSoundPath').value = state.settings.soundPath || '';
+    }
+    if (document.getElementById('inputSoundUrl')) {
+      document.getElementById('inputSoundUrl').value = state.settings.soundUrl || '';
+    }
+    if (document.getElementById('inputWebhookUrl')) {
+      document.getElementById('inputWebhookUrl').value = state.settings.webhookUrl || '';
+    }
+    selectSoundMode(state.settings.soundType || 'default');
+
+    if (window.api && window.api.getAutoLaunch) {
+      window.api.getAutoLaunch().then(res => {
+        if (res && typeof res.enabled === 'boolean') {
+          state.settings.launchOnStartup = res.enabled;
+          const chk = document.getElementById('checkLaunchOnStartup');
+          if (chk) chk.checked = res.enabled;
+        }
+      }).catch(() => {});
+    }
+
     updateSettingsUI();
     if (window.api && window.api.updateSettings) {
       window.api.updateSettings(state.settings);
@@ -4308,13 +4933,26 @@
     }
 
     function selectNavTab(tab) {
-      document.getElementById('tabWaitlists').classList.toggle('active', tab === 'waitlists');
-      document.getElementById('tabSettings').classList.toggle('active', tab === 'settings');
+      const isSettings = tab === 'settings';
+      document.getElementById('tabWaitlists').classList.toggle('active', !isSettings);
+      document.getElementById('tabSettings').classList.toggle('active', isSettings);
 
-      if (tab === 'settings') {
-        toggleSettingsDrawer(true);
+      const waitlistsHeader = document.getElementById('waitlistsHeader');
+      const settingsHeader = document.getElementById('settingsHeader');
+      const dashboardView = document.getElementById('dashboardView');
+      const settingsPageView = document.getElementById('settingsPageView');
+      const emptyStateView = document.getElementById('emptyStateView');
+
+      if (waitlistsHeader) waitlistsHeader.style.display = isSettings ? 'none' : 'flex';
+      if (settingsHeader) settingsHeader.style.display = isSettings ? 'flex' : 'none';
+      if (dashboardView) dashboardView.style.display = isSettings ? 'none' : 'grid';
+      if (settingsPageView) settingsPageView.style.display = isSettings ? 'flex' : 'none';
+
+      if (isSettings) {
+        if (emptyStateView) emptyStateView.style.display = 'none';
+        updateSettingsUI();
       } else {
-        toggleSettingsDrawer(false);
+        renderServers();
       }
     }
 
@@ -4978,25 +5616,11 @@
     }
 
     function toggleSettingsDrawer(open) {
-      const drawer = document.getElementById('settingsDrawer');
-      const backdrop = document.getElementById('drawerBackdrop');
-      if (open) {
-        drawer?.classList.add('open');
-        backdrop?.classList.add('open');
-      } else {
-        drawer?.classList.remove('open');
-        backdrop?.classList.remove('open');
-      }
+      selectNavTab(open ? 'settings' : 'waitlists');
     }
 
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' || e.key === 'Esc') {
-        const drawer = document.getElementById('settingsDrawer');
-        if (drawer && drawer.classList.contains('open')) {
-          toggleSettingsDrawer(false);
-          return;
-        }
-
         const addCustomModal = document.getElementById('addCustomModal');
         if (addCustomModal && addCustomModal.style.display === 'flex') {
           closeAddCustomModal();
@@ -5028,17 +5652,66 @@
           if (pill) pill.classList.remove('open');
           return;
         }
+
+        const settingsPageView = document.getElementById('settingsPageView');
+        if (settingsPageView && settingsPageView.style.display === 'flex') {
+          selectNavTab('waitlists');
+          return;
+        }
       }
     });
 
-    function updateSettingsUI() {
-      const cps = document.getElementById('sliderCps').value;
-      const burst = document.getElementById('sliderBurst').value;
-      const cooldown = document.getElementById('sliderCooldown').value;
+    function selectSoundMode(mode) {
+      state.settings.soundType = mode;
+      const btnDefault = document.getElementById('btnSoundDefault');
+      const btnFile = document.getElementById('btnSoundFile');
+      const btnUrl = document.getElementById('btnSoundUrl');
+      const rowFile = document.getElementById('soundFileRow');
+      const rowUrl = document.getElementById('soundUrlRow');
 
-      document.getElementById('badgeCps').textContent = `${cps}/s`;
-      document.getElementById('badgeBurst').textContent = `${burst} s`;
-      document.getElementById('badgeCooldown').textContent = `${cooldown} s`;
+      if (btnDefault) btnDefault.classList.toggle('active', mode === 'default');
+      if (btnFile) btnFile.classList.toggle('active', mode === 'custom_file');
+      if (btnUrl) btnUrl.classList.toggle('active', mode === 'custom_url');
+
+      if (rowFile) rowFile.style.display = mode === 'custom_file' ? 'block' : 'none';
+      if (rowUrl) rowUrl.style.display = mode === 'custom_url' ? 'block' : 'none';
+    }
+
+    async function browseAudioFile() {
+      if (!window.api || !window.api.openAudioFile) return;
+      try {
+        const res = await window.api.openAudioFile();
+        if (res && !res.canceled && res.filePath) {
+          state.settings.soundPath = res.filePath;
+          const input = document.getElementById('inputSoundPath');
+          if (input) input.value = res.filePath;
+          saveSettings();
+        }
+      } catch (err) {}
+    }
+
+    function toggleLaunchOnStartup(checked) {
+      state.settings.launchOnStartup = checked;
+      if (window.api && window.api.setAutoLaunch) {
+        window.api.setAutoLaunch(checked);
+      }
+      saveSettings();
+    }
+
+    function updateSettingsUI() {
+      const cpsEl = document.getElementById('sliderCps');
+      const burstEl = document.getElementById('sliderBurst');
+      const cooldownEl = document.getElementById('sliderCooldown');
+
+      if (cpsEl) {
+        document.getElementById('badgeCps').textContent = `${cpsEl.value}/s`;
+      }
+      if (burstEl) {
+        document.getElementById('badgeBurst').textContent = `${burstEl.value} s`;
+      }
+      if (cooldownEl) {
+        document.getElementById('badgeCooldown').textContent = `${cooldownEl.value} s`;
+      }
 
       const pauseAfterJoin = document.getElementById('checkPauseAfterJoin')?.checked ?? true;
       const pauseDuration = parseInt(document.getElementById('sliderPauseDuration')?.value || '60', 10);
@@ -5071,26 +5744,55 @@
         groupIdleThreshold.style.opacity = pauseOnIdle ? '1' : '0.35';
         groupIdleThreshold.style.pointerEvents = pauseOnIdle ? 'auto' : 'none';
       }
+
+      const soundEnabled = document.getElementById('checkSoundEnabled')?.checked ?? true;
+      const soundControlsWrap = document.getElementById('soundControlsWrap');
+      if (soundControlsWrap) {
+        soundControlsWrap.style.opacity = soundEnabled ? '1' : '0.35';
+        soundControlsWrap.style.pointerEvents = soundEnabled ? 'auto' : 'none';
+      }
+
+      const volumeSlider = document.getElementById('sliderSoundVolume');
+      const badgeSoundVolume = document.getElementById('badgeSoundVolume');
+      if (volumeSlider && badgeSoundVolume) {
+        badgeSoundVolume.textContent = `${volumeSlider.value}%`;
+      }
     }
 
     function saveSettings() {
-      state.settings.cps = parseInt(document.getElementById('sliderCps').value, 10);
-      state.settings.burstLength = parseFloat(document.getElementById('sliderBurst').value);
-      state.settings.cooldown = parseInt(document.getElementById('sliderCooldown').value, 10);
+      const cpsEl = document.getElementById('sliderCps');
+      const burstEl = document.getElementById('sliderBurst');
+      const cooldownEl = document.getElementById('sliderCooldown');
+      const pauseJoinEl = document.getElementById('checkPauseAfterJoin');
+      const pauseDurEl = document.getElementById('sliderPauseDuration');
+      const pauseIdleEl = document.getElementById('checkPauseOnIdle');
+      const idleThreshEl = document.getElementById('sliderIdleThreshold');
+      const minTrayEl = document.getElementById('checkMinimizeToTray');
+      const launchStartupEl = document.getElementById('checkLaunchOnStartup');
+      const deskNotifEl = document.getElementById('checkDesktopNotifications');
+      const soundEnabledEl = document.getElementById('checkSoundEnabled');
+      const soundVolEl = document.getElementById('sliderSoundVolume');
+      const soundPathEl = document.getElementById('inputSoundPath');
+      const soundUrlEl = document.getElementById('inputSoundUrl');
+      const webhookUrlEl = document.getElementById('inputWebhookUrl');
 
-      const pauseAfterJoin = document.getElementById('checkPauseAfterJoin').checked;
-      const pauseDurationMinutes = parseInt(document.getElementById('sliderPauseDuration').value, 10);
-      const pauseOnIdle = document.getElementById('checkPauseOnIdle').checked;
-      const idleThresholdMinutes = parseInt(document.getElementById('sliderIdleThreshold').value, 10);
-      const minimizeToTray = document.getElementById('checkMinimizeToTray') ? document.getElementById('checkMinimizeToTray').checked : true;
+      if (cpsEl) state.settings.cps = parseInt(cpsEl.value, 10);
+      if (burstEl) state.settings.burstLength = parseFloat(burstEl.value);
+      if (cooldownEl) state.settings.cooldown = parseInt(cooldownEl.value, 10);
+      if (pauseJoinEl) state.settings.pauseAfterJoin = pauseJoinEl.checked;
+      if (pauseDurEl) state.settings.pauseDurationMinutes = parseInt(pauseDurEl.value, 10);
+      if (pauseIdleEl) state.settings.pauseOnIdle = pauseIdleEl.checked;
+      if (idleThreshEl) state.settings.idleThresholdMinutes = parseInt(idleThreshEl.value, 10);
+      if (minTrayEl) state.settings.minimizeToTray = minTrayEl.checked;
+      if (launchStartupEl) state.settings.launchOnStartup = launchStartupEl.checked;
+      if (deskNotifEl) state.settings.desktopNotifications = deskNotifEl.checked;
+      if (soundEnabledEl) state.settings.soundEnabled = soundEnabledEl.checked;
+      if (soundVolEl) state.settings.soundVolume = parseInt(soundVolEl.value, 10);
+      if (soundPathEl) state.settings.soundPath = soundPathEl.value.trim();
+      if (soundUrlEl) state.settings.soundUrl = soundUrlEl.value.trim();
+      if (webhookUrlEl) state.settings.webhookUrl = webhookUrlEl.value.trim();
 
-      state.settings.pauseAfterJoin = pauseAfterJoin;
-      state.settings.pauseDurationMinutes = pauseDurationMinutes;
-      state.settings.pauseOnIdle = pauseOnIdle;
-      state.settings.idleThresholdMinutes = idleThresholdMinutes;
-      state.settings.minimizeToTray = minimizeToTray;
-
-      if (!pauseAfterJoin && state.queuePauseUntil > 0) {
+      if (!state.settings.pauseAfterJoin && state.queuePauseUntil > 0) {
         resumeSnipingNow();
       }
 
@@ -5098,24 +5800,75 @@
         localStorage.setItem('qpilot_settings', JSON.stringify(state.settings));
       } catch (e) {}
 
-      window.api.updateSettings(state.settings);
-      toggleSettingsDrawer(false);
-      logTimelineEvent('Saved click & queue settings', `${state.settings.cps}/s, ${state.settings.burstLength}s burst, idle ${idleThresholdMinutes}m`, false, null, 'blue');
+      if (window.api && window.api.updateSettings) {
+        window.api.updateSettings(state.settings);
+      }
+
+      logTimelineEvent('Settings saved', `${state.settings.cps}/s, ${state.settings.burstLength}s burst, idle ${state.settings.idleThresholdMinutes}m`, false, null, 'blue');
+
+      const headerBtn = document.getElementById('headerSaveSettingsBtn');
+      if (headerBtn) {
+        const originalHtml = headerBtn.innerHTML;
+        headerBtn.innerHTML = '<i class="ph ph-check"></i><span>Saved!</span>';
+        setTimeout(() => {
+          headerBtn.innerHTML = originalHtml;
+        }, 1400);
+      }
     }
 
-    function playQueueSuccessSound() {
+    function resetSettingsToDefault() {
+      state.settings.cps = 100;
+      state.settings.burstLength = 3.0;
+      state.settings.cooldown = 60;
+      state.settings.pauseAfterJoin = true;
+      state.settings.pauseDurationMinutes = 60;
+      state.settings.pauseOnIdle = true;
+      state.settings.idleThresholdMinutes = 5;
+      state.settings.minimizeToTray = true;
+      state.settings.launchOnStartup = false;
+      state.settings.desktopNotifications = true;
+      state.settings.soundEnabled = true;
+      state.settings.soundType = 'default';
+      state.settings.soundPath = '';
+      state.settings.soundUrl = '';
+      state.settings.soundVolume = 80;
+      state.settings.webhookUrl = '';
+
+      if (document.getElementById('sliderCps')) document.getElementById('sliderCps').value = 100;
+      if (document.getElementById('sliderBurst')) document.getElementById('sliderBurst').value = 3.0;
+      if (document.getElementById('sliderCooldown')) document.getElementById('sliderCooldown').value = 60;
+      if (document.getElementById('checkPauseAfterJoin')) document.getElementById('checkPauseAfterJoin').checked = true;
+      if (document.getElementById('sliderPauseDuration')) document.getElementById('sliderPauseDuration').value = 60;
+      if (document.getElementById('checkPauseOnIdle')) document.getElementById('checkPauseOnIdle').checked = true;
+      if (document.getElementById('sliderIdleThreshold')) document.getElementById('sliderIdleThreshold').value = 5;
+      if (document.getElementById('checkMinimizeToTray')) document.getElementById('checkMinimizeToTray').checked = true;
+      if (document.getElementById('checkLaunchOnStartup')) document.getElementById('checkLaunchOnStartup').checked = false;
+      if (document.getElementById('checkDesktopNotifications')) document.getElementById('checkDesktopNotifications').checked = true;
+      if (document.getElementById('checkSoundEnabled')) document.getElementById('checkSoundEnabled').checked = true;
+      if (document.getElementById('sliderSoundVolume')) document.getElementById('sliderSoundVolume').value = 80;
+      if (document.getElementById('inputSoundPath')) document.getElementById('inputSoundPath').value = '';
+      if (document.getElementById('inputSoundUrl')) document.getElementById('inputSoundUrl').value = '';
+      if (document.getElementById('inputWebhookUrl')) document.getElementById('inputWebhookUrl').value = '';
+
+      selectSoundMode('default');
+      updateSettingsUI();
+      saveSettings();
+    }
+
+    function playDefaultChime(volume = 0.8) {
       try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtx) return;
         const ctx = new AudioCtx();
         const now = ctx.currentTime;
+        const safeVol = Math.max(0.01, Math.min(1, volume));
 
         const osc1 = ctx.createOscillator();
         const gain1 = ctx.createGain();
         osc1.type = 'sine';
         osc1.frequency.setValueAtTime(587.33, now);
         gain1.gain.setValueAtTime(0, now);
-        gain1.gain.linearRampToValueAtTime(0.2, now + 0.04);
+        gain1.gain.linearRampToValueAtTime(0.25 * safeVol, now + 0.04);
         gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
         osc1.connect(gain1);
         gain1.connect(ctx.destination);
@@ -5127,19 +5880,213 @@
         osc2.type = 'triangle';
         osc2.frequency.setValueAtTime(880, now + 0.12);
         gain2.gain.setValueAtTime(0, now + 0.12);
-        gain2.gain.linearRampToValueAtTime(0.25, now + 0.16);
+        gain2.gain.linearRampToValueAtTime(0.3 * safeVol, now + 0.16);
         gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
         osc2.connect(gain2);
         gain2.connect(ctx.destination);
         osc2.start(now + 0.12);
         osc2.stop(now + 0.62);
-      } catch (e) {
-        console.warn('[Audio] Failed to play queue chime:', e);
+      } catch (e) {}
+    }
+
+    function playAlertSound() {
+      if (state.settings.soundEnabled === false) return;
+      const vol = typeof state.settings.soundVolume === 'number' ? Math.max(0, Math.min(1, state.settings.soundVolume / 100)) : 0.8;
+      const soundType = state.settings.soundType || 'default';
+
+      if (soundType === 'custom_file' && state.settings.soundPath) {
+        try {
+          const audioUrl = 'file:///' + state.settings.soundPath.replace(/\\/g, '/');
+          const audio = new Audio(audioUrl);
+          audio.volume = vol;
+          audio.play().catch(() => {
+            playDefaultChime(vol);
+          });
+          return;
+        } catch (e) {
+          playDefaultChime(vol);
+          return;
+        }
+      }
+
+      if (soundType === 'custom_url' && state.settings.soundUrl) {
+        try {
+          const audio = new Audio(state.settings.soundUrl);
+          audio.volume = vol;
+          audio.play().catch(() => {
+            playDefaultChime(vol);
+          });
+          return;
+        } catch (e) {
+          playDefaultChime(vol);
+          return;
+        }
+      }
+
+      playDefaultChime(vol);
+    }
+
+    function testAlertSound() {
+      const volEl = document.getElementById('sliderSoundVolume');
+      if (volEl) state.settings.soundVolume = parseInt(volEl.value, 10);
+      const pathEl = document.getElementById('inputSoundPath');
+      if (pathEl) state.settings.soundPath = pathEl.value.trim();
+      const urlEl = document.getElementById('inputSoundUrl');
+      if (urlEl) state.settings.soundUrl = urlEl.value.trim();
+      playAlertSound();
+    }
+
+    function testDesktopNotification() {
+      if (window.api && window.api.showNotification) {
+        window.api.showNotification({
+          title: 'qPilot Alerts Active',
+          body: 'Desktop notifications will appear whenever you join a queue.',
+        });
+      }
+    }
+
+    async function testDiscordWebhook() {
+      const input = document.getElementById('inputWebhookUrl');
+      const url = input ? input.value.trim() : '';
+      if (!url) {
+        alert('Please enter a Discord Webhook URL first.');
+        return;
+      }
+      if (!url.startsWith('https://discord.com/api/webhooks/')) {
+        alert('Invalid Discord webhook URL format. It should start with https://discord.com/api/webhooks/');
+        return;
+      }
+      if (window.api && window.api.testWebhook) {
+        try {
+          const res = await window.api.testWebhook({ webhookUrl: url });
+          if (res && res.success) {
+            alert('Webhook test message sent successfully! Check your Discord channel.');
+          } else {
+            alert(`Webhook test failed: ${res?.error || 'Unknown error'}`);
+          }
+        } catch (err) {
+          alert(`Webhook error: ${err.message}`);
+        }
+      }
+    }
+
+    async function triggerAutoDetectLogin() {
+      const btn = document.getElementById('loginAutoDetectBtn');
+      const btnText = document.getElementById('loginAutoDetectBtnText');
+      const resultsWrap = document.getElementById('loginAutoDetectResults');
+      if (!btn || !resultsWrap) return;
+
+      btn.disabled = true;
+      if (btnText) btnText.textContent = 'Detecting Discord sessions...';
+
+      try {
+        const res = await window.api.autoFetchTokens();
+        if (res && res.success && res.accounts && res.accounts.length > 0) {
+          renderAutoDetectList(res.accounts, resultsWrap, false);
+          resultsWrap.style.display = 'flex';
+          if (btnText) btnText.textContent = `Found ${res.accounts.length} Session${res.accounts.length > 1 ? 's' : ''}`;
+        } else {
+          resultsWrap.innerHTML = `
+            <div class="autofetch-empty">
+              No active Discord desktop sessions found. Make sure Discord desktop is running or enter your token below.
+            </div>
+          `;
+          resultsWrap.style.display = 'flex';
+          if (btnText) btnText.textContent = 'Auto-detect from Discord';
+        }
+      } catch (err) {
+        resultsWrap.innerHTML = `
+          <div class="autofetch-empty">Detection error: ${err.message || 'Unknown'}. Enter token below.</div>
+        `;
+        resultsWrap.style.display = 'flex';
+        if (btnText) btnText.textContent = 'Auto-detect from Discord';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function triggerAutoDetectModal() {
+      const btn = document.getElementById('modalAutoDetectBtn');
+      const btnText = document.getElementById('modalAutoDetectBtnText');
+      const resultsWrap = document.getElementById('modalAutoDetectResults');
+      if (!btn || !resultsWrap) return;
+
+      btn.disabled = true;
+      if (btnText) btnText.textContent = 'Detecting Discord sessions...';
+
+      try {
+        const res = await window.api.autoFetchTokens();
+        if (res && res.success && res.accounts && res.accounts.length > 0) {
+          const available = res.accounts.filter(a => !state.accounts.has(a.user.id));
+          if (available.length > 0) {
+            renderAutoDetectList(available, resultsWrap, true);
+            resultsWrap.style.display = 'flex';
+            if (btnText) btnText.textContent = `Found ${available.length} Session${available.length > 1 ? 's' : ''}`;
+          } else {
+            resultsWrap.innerHTML = `
+              <div class="autofetch-empty" style="color: #cbd5e1; border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);">
+                All detected Discord accounts are already connected.
+              </div>
+            `;
+            resultsWrap.style.display = 'flex';
+            if (btnText) btnText.textContent = 'Auto-detect Discord Account';
+          }
+        } else {
+          resultsWrap.innerHTML = `
+            <div class="autofetch-empty">
+              No active Discord desktop sessions detected. Enter token below.
+            </div>
+          `;
+          resultsWrap.style.display = 'flex';
+          if (btnText) btnText.textContent = 'Auto-detect Discord Account';
+        }
+      } catch (err) {
+        resultsWrap.innerHTML = `
+          <div class="autofetch-empty">Detection error: ${err.message || 'Unknown'}</div>
+        `;
+        resultsWrap.style.display = 'flex';
+        if (btnText) btnText.textContent = 'Auto-detect Discord Account';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function renderAutoDetectList(accounts, container, isModal) {
+      container.innerHTML = accounts.map((acc) => {
+        const avatarUrl = acc.user.avatar
+          ? `https://cdn.discordapp.com/avatars/${acc.user.id}/${acc.user.avatar}.png?size=64`
+          : 'https://cdn.discordapp.com/embed/avatars/0.png';
+        const displayName = acc.user.globalName || acc.user.username;
+        return `
+          <div class="autofetch-account-card">
+            <div class="autofetch-account-left">
+              <img src="${avatarUrl}" class="autofetch-avatar" alt="${displayName}">
+              <div class="autofetch-account-info">
+                <span class="autofetch-username">${displayName}</span>
+                <span class="autofetch-source-tag">${acc.source} (@${acc.user.username})</span>
+              </div>
+            </div>
+            <button type="button" class="autofetch-connect-btn" onclick="connectDetectedAccount('${acc.token}', ${isModal})">
+              Connect
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function connectDetectedAccount(token, isModal) {
+      if (isModal) {
+        document.getElementById('modalTokenInput').value = token;
+        closeAddAccountModal();
+        await addAdditionalAccount(token);
+      } else {
+        document.getElementById('discordTokenInput').value = token;
+        await handleLogin();
       }
     }
 
     function triggerQueueJoinedPrompt(info) {
-      playQueueSuccessSound();
+      playAlertSound();
 
       const modal = document.getElementById('queueEnteredModal');
       const modalGuild = document.getElementById('modalQueueGuild');

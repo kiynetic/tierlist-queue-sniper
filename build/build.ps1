@@ -9,7 +9,23 @@ $DistDir = Join-Path $Root "dist"
 $PackagedDir = Join-Path $DistDir "qPilot-win32-x64"
 $PortableZip = Join-Path $DistDir "qPilot-v1.0.0-win-x64-portable.zip"
 $InstallerExe = Join-Path $DistDir "qPilot-v1.0.0-Setup.exe"
-$CscPath = "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
+
+$IsccPath = $null
+$CandidatePaths = @(
+    "ISCC.exe",
+    "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe",
+    "C:\Program Files (x86)\Inno Setup 6\ISCC.exe",
+    "C:\Program Files\Inno Setup 6\ISCC.exe"
+)
+foreach ($p in $CandidatePaths) {
+    if (Get-Command $p -ErrorAction SilentlyContinue) {
+        $IsccPath = (Get-Command $p).Source
+        break
+    } elseif (Test-Path $p) {
+        $IsccPath = $p
+        break
+    }
+}
 
 Get-Process -Name qPilot -ErrorAction SilentlyContinue | Stop-Process -Force
 
@@ -30,15 +46,15 @@ if ($Target -eq "Portable" -or $Target -eq "All") {
 }
 
 if ($Target -eq "Installer" -or $Target -eq "All") {
-    Write-Host "Compiling setup installer..." -ForegroundColor Cyan
+    Write-Host "Compiling Inno Setup installer..." -ForegroundColor Cyan
+    if (-not $IsccPath) {
+        throw "Inno Setup compiler (ISCC.exe) not found."
+    }
     if (Test-Path $InstallerExe) { Remove-Item $InstallerExe -Force }
-    $outArg = "/out:$InstallerExe"
-    $iconArg = "/win32icon:" + (Join-Path $Root "src\assets\icon.ico")
-    $resArg = "/resource:$PortableZip,qpilot_payload"
-    $sourceFile = Join-Path $Root "build\Installer.cs"
-    & $CscPath /target:winexe /optimize+ $outArg $iconArg $resArg /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /r:Microsoft.CSharp.dll $sourceFile
+    $IssFile = Join-Path $Root "build\installer.iss"
+    & $IsccPath $IssFile
     if ($LASTEXITCODE -ne 0) {
-        throw "Failed to compile setup installer"
+        throw "Failed to compile Inno Setup installer"
     }
     Write-Host "Installer build complete: $InstallerExe" -ForegroundColor Green
 }
