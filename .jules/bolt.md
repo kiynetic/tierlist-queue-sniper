@@ -1,0 +1,3 @@
+## 2024-05-18 - Fast filtering for noisy WebSocket events
+**Learning:** The Discord gateway produces massive amounts of noisy events (like `PRESENCE_UPDATE` or `TYPING_START`) that we must filter out immediately. A naive chained `.includes()` approach (`str.includes("A") || str.includes("B") || ...`) is extremely slow because it does string matching multiple times from the start of the string for each condition.
+**Action:** When filtering high-frequency textual streams (like raw WebSocket strings before JSON parse) for multiple possible string literals, use a single pre-compiled regular expression (`/A|B|C/.test(str)`). This is heavily optimized in V8 (often 10x faster) and helps avoid blocking the event loop on massive data firehoses.
