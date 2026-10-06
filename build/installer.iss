@@ -1,5 +1,5 @@
 #define MyAppName "qPilot"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "kiynetic"
 #define MyAppURL "https://github.com/kiynetic/tierlist-queue-sniper"
 #define MyAppExeName "qPilot.exe"
@@ -17,7 +17,7 @@ DefaultDirName={localappdata}\Programs\{#MyAppName}
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 OutputDir=..\dist
-OutputBaseFilename=qPilot-v1.0.0-Setup
+OutputBaseFilename=qPilot-v1.1.0-Setup
 SetupIconFile=..\src\assets\icon.ico
 Compression=lzma2/max
 SolidCompression=yes

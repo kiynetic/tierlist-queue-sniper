@@ -7,8 +7,10 @@ $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $PSScriptRoot
 $DistDir = Join-Path $Root "dist"
 $PackagedDir = Join-Path $DistDir "qPilot-win32-x64"
-$PortableZip = Join-Path $DistDir "qPilot-v1.0.0-win-x64-portable.zip"
-$InstallerExe = Join-Path $DistDir "qPilot-v1.0.0-Setup.exe"
+$PackageJson = Get-Content (Join-Path $Root "package.json") -Raw | ConvertFrom-Json
+$Version = $PackageJson.version
+$PortableZip = Join-Path $DistDir "qPilot-v$Version-win-x64-portable.zip"
+$InstallerExe = Join-Path $DistDir "qPilot-v$Version-Setup.exe"
 
 $IsccPath = $null
 $CandidatePaths = @(
