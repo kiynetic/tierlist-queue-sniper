@@ -14,6 +14,16 @@ const WAITLIST_CHANNEL_KEYWORDS = [
   'waitlist', 'queue', 'tester-queue', 'test-queue', 'wait-list'
 ];
 
+// Pre-allocate Buffers for fast event filtering without string decoding
+const IGNORED_EVENTS_BUFFERS = [
+  Buffer.from('"t":"PRESENCE_UPDATE"'),
+  Buffer.from('"t":"TYPING_START"'),
+  Buffer.from('"t":"VOICE_STATE_UPDATE"'),
+  Buffer.from('"t":"SESSIONS_REPLACE"'),
+  Buffer.from('"t":"CHANNEL_UNREAD_UPDATE"'),
+  Buffer.from('"t":"THREAD_LIST_SYNC"')
+];
+
 const SUPER_PROPERTIES = Buffer.from(
   JSON.stringify({
     os: 'Windows',
@@ -153,18 +163,36 @@ class DiscordClient extends EventEmitter {
 
   _onWebSocketMessage(raw) {
     try {
+      // Fast path: avoid string decoding overhead for dropped events
+      if (Buffer.isBuffer(raw)) {
+        if (
+          raw.includes(IGNORED_EVENTS_BUFFERS[0]) ||
+          raw.includes(IGNORED_EVENTS_BUFFERS[1]) ||
+          raw.includes(IGNORED_EVENTS_BUFFERS[2]) ||
+          raw.includes(IGNORED_EVENTS_BUFFERS[3]) ||
+          raw.includes(IGNORED_EVENTS_BUFFERS[4]) ||
+          raw.includes(IGNORED_EVENTS_BUFFERS[5])
+        ) {
+          return;
+        }
+      }
+
       const str = typeof raw === 'string' ? raw : raw.toString();
 
-      if (
-        str.includes('"t":"PRESENCE_UPDATE"') ||
-        str.includes('"t":"TYPING_START"') ||
-        str.includes('"t":"VOICE_STATE_UPDATE"') ||
-        str.includes('"t":"SESSIONS_REPLACE"') ||
-        str.includes('"t":"CHANNEL_UNREAD_UPDATE"') ||
-        str.includes('"t":"THREAD_LIST_SYNC"')
-      ) {
-        return;
+      // Fallback for string payloads (though ws usually provides Buffers)
+      if (typeof raw === 'string') {
+        if (
+          str.includes('"t":"PRESENCE_UPDATE"') ||
+          str.includes('"t":"TYPING_START"') ||
+          str.includes('"t":"VOICE_STATE_UPDATE"') ||
+          str.includes('"t":"SESSIONS_REPLACE"') ||
+          str.includes('"t":"CHANNEL_UNREAD_UPDATE"') ||
+          str.includes('"t":"THREAD_LIST_SYNC"')
+        ) {
+          return;
+        }
       }
+
       const msg = JSON.parse(str);
       this._handleGateway(msg);
     } catch (e) {}
