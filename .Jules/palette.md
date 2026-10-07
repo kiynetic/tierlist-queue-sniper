@@ -1,0 +1,3 @@
+## 2024-03-24 - Missing ARIA Labels on Icon-Only Buttons
+**Learning:** Icon-only modal close buttons in this app lacked explicit ARIA labels, meaning screen readers would announce them only as generic buttons without indicating their purpose.
+**Action:** Added `aria-label="Close modal"` to `<button class="modal-close-btn">` components across all modals, and will check icon-only buttons for `aria-label` or `title` moving forward.
