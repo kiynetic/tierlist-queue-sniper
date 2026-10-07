@@ -1,0 +1,3 @@
+## 2024-10-24 - Avoiding `.toString()` on dropped WebSocket Buffers
+**Learning:** In high-throughput WebSocket handlers, calling `.toString()` on incoming `raw` Buffers before filtering out ignored events creates unnecessary Garbage Collection (GC) pressure and string decoding overhead. By converting the string patterns to `Buffer`s and using `raw.includes(buffer)`, we avoid creating intermediate strings for discarded messages.
+**Action:** Always prefer operating on raw `Buffer`s directly when doing simple substring/pattern matching for filtering or dropping data before decoding it to a string.
