@@ -148,6 +148,11 @@
       line-height: 1;
     }
 
+    .win-btn:focus-visible {
+      outline: 2px solid var(--accent-blue);
+      outline-offset: -2px;
+    }
+
     .win-btn:hover {
       background: rgba(255, 255, 255, 0.08);
       border-color: rgba(255, 255, 255, 0.06);
@@ -1526,6 +1531,11 @@
       transition: all 0.15s ease;
     }
 
+    .remove-account-btn:focus-visible {
+      outline: 2px solid var(--accent-blue);
+      outline-offset: 2px;
+    }
+
     .remove-account-btn:hover {
       color: #ff5555;
       background: rgba(255, 85, 85, 0.1);
@@ -1726,6 +1736,11 @@
       padding: 4px 8px;
       border-radius: 6px;
       transition: all 0.15s ease;
+    }
+
+    .modal-close-btn:focus-visible {
+      outline: 2px solid var(--accent-blue);
+      outline-offset: 2px;
     }
 
     .modal-close-btn:hover {
@@ -3298,9 +3313,9 @@
       <span>qPilot</span>
     </div>
     <div class="window-controls">
-      <button class="win-btn" onclick="window.api.minimizeWindow()" title="Minimize"><i class="ph ph-minus"></i></button>
-      <button class="win-btn" onclick="window.api.maximizeWindow()" title="Maximize"><i class="ph ph-square"></i></button>
-      <button class="win-btn close" onclick="window.api.closeWindow()" title="Close"><i class="ph ph-x"></i></button>
+      <button class="win-btn" aria-label="Minimize" onclick="window.api.minimizeWindow()" title="Minimize"><i class="ph ph-minus"></i></button>
+      <button class="win-btn" aria-label="Maximize" onclick="window.api.maximizeWindow()" title="Maximize"><i class="ph ph-square"></i></button>
+      <button class="win-btn close" aria-label="Close" onclick="window.api.closeWindow()" title="Close"><i class="ph ph-x"></i></button>
     </div>
   </div>
 
@@ -3848,7 +3863,7 @@
             <div class="modal-title" style="font-size: 18px; color: #4ade80;">Successfully Entered Queue!</div>
             <div class="modal-subtitle">You have successfully joined the waitlist queue</div>
           </div>
-          <button class="modal-close-btn" onclick="closeQueueEnteredModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" aria-label="Close modal" onclick="closeQueueEnteredModal()"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="queue-entered-body">
@@ -3891,7 +3906,7 @@
               <div class="modal-subtitle" id="updateModalSubtitle">A new version of qPilot is ready to install</div>
             </div>
           </div>
-          <button class="modal-close-btn" onclick="closeUpdateModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" aria-label="Close modal" onclick="closeUpdateModal()"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="modal-body" style="gap: 14px;">
@@ -3940,7 +3955,7 @@
               <div class="modal-subtitle">Connect another account to snipe waitlists concurrently</div>
             </div>
           </div>
-          <button class="modal-close-btn" onclick="closeAddAccountModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" aria-label="Close modal" onclick="closeAddAccountModal()"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="modal-body">
@@ -4027,7 +4042,7 @@
               <div class="modal-subtitle">Snipe any server, waitlist channel, or custom button text</div>
             </div>
           </div>
-          <button class="modal-close-btn" onclick="closeAddCustomModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" aria-label="Close modal" onclick="closeAddCustomModal()"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
@@ -4779,7 +4794,7 @@
                 </div>
 
                 ${ch.isCustom ? `
-                  <button class="remove-account-btn" onclick="removeCustomWaitlist('${ch.id}', event)" title="Remove custom waitlist" style="margin-left: 4px;">
+                  <button class="remove-account-btn" aria-label="Remove custom waitlist" onclick="removeCustomWaitlist('${ch.id}', event)" title="Remove custom waitlist" style="margin-left: 4px;">
                     <i class="ph ph-x" style="font-size: 12px;"></i>
                   </button>
                 ` : ''}
@@ -5010,7 +5025,7 @@
           </div>
           <div class="account-item-right">
             ${isActive ? `<span class="active-badge">Active</span>` : `<button class="switch-btn">Switch</button>`}
-            <button class="remove-account-btn" onclick="event.stopPropagation(); removeAccount('${acc.id}')" title="Disconnect account">
+            <button class="remove-account-btn" aria-label="Disconnect account" onclick="event.stopPropagation(); removeAccount('${acc.id}')" title="Disconnect account">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"/>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
