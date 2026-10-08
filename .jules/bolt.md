@@ -1,0 +1,3 @@
+## 2024-03-24 - String checking in massive JSON payloads
+**Learning:** Using multiple `.includes()` checks on extremely large string payloads (like incoming Discord Gateway WebSocket messages) causes severe performance drops because each check scans the entire O(N) string independently.
+**Action:** Always slice large strings `substring(0, N)` when checking for headers/keys near the start of the payload, and use a single Regex `.test()` matching multiple patterns instead of sequential `.includes()`.
