@@ -3298,9 +3298,9 @@
       <span>qPilot</span>
     </div>
     <div class="window-controls">
-      <button class="win-btn" onclick="window.api.minimizeWindow()" title="Minimize"><i class="ph ph-minus"></i></button>
-      <button class="win-btn" onclick="window.api.maximizeWindow()" title="Maximize"><i class="ph ph-square"></i></button>
-      <button class="win-btn close" onclick="window.api.closeWindow()" title="Close"><i class="ph ph-x"></i></button>
+      <button class="win-btn" onclick="window.api.minimizeWindow()" title="Minimize" aria-label="Minimize window"><i class="ph ph-minus"></i></button>
+      <button class="win-btn" onclick="window.api.maximizeWindow()" title="Maximize" aria-label="Maximize window"><i class="ph ph-square"></i></button>
+      <button class="win-btn close" onclick="window.api.closeWindow()" title="Close" aria-label="Close window"><i class="ph ph-x"></i></button>
     </div>
   </div>
 
@@ -3848,7 +3848,7 @@
             <div class="modal-title" style="font-size: 18px; color: #4ade80;">Successfully Entered Queue!</div>
             <div class="modal-subtitle">You have successfully joined the waitlist queue</div>
           </div>
-          <button class="modal-close-btn" onclick="closeQueueEnteredModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" onclick="closeQueueEnteredModal()" aria-label="Close modal"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="queue-entered-body">
@@ -3891,7 +3891,7 @@
               <div class="modal-subtitle" id="updateModalSubtitle">A new version of qPilot is ready to install</div>
             </div>
           </div>
-          <button class="modal-close-btn" onclick="closeUpdateModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" onclick="closeUpdateModal()" aria-label="Close modal"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="modal-body" style="gap: 14px;">
@@ -3940,7 +3940,7 @@
               <div class="modal-subtitle">Connect another account to snipe waitlists concurrently</div>
             </div>
           </div>
-          <button class="modal-close-btn" onclick="closeAddAccountModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" onclick="closeAddAccountModal()" aria-label="Close modal"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="modal-body">
@@ -4027,7 +4027,7 @@
               <div class="modal-subtitle">Snipe any server, waitlist channel, or custom button text</div>
             </div>
           </div>
-          <button class="modal-close-btn" onclick="closeAddCustomModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" onclick="closeAddCustomModal()" aria-label="Close modal"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
