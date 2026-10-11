@@ -47,20 +47,26 @@ function getStoreFilePath() {
   return path.join(userDataDir, 'qpilot_store.json');
 }
 
+let storeCache = null;
+
 function readStore() {
+  if (storeCache) return storeCache;
   try {
     const p = getStoreFilePath();
     if (fs.existsSync(p)) {
       const data = fs.readFileSync(p, 'utf8');
-      return JSON.parse(data);
+      storeCache = JSON.parse(data);
+      return storeCache;
     }
   } catch (err) {
     console.error('[Store] Failed to read store file:', err);
   }
-  return {};
+  storeCache = {};
+  return storeCache;
 }
 
 function writeStore(data) {
+  storeCache = data; // Update cache
   try {
     const p = getStoreFilePath();
     const dir = path.dirname(p);
