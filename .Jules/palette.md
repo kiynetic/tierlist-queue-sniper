@@ -1,0 +1,3 @@
+## 2024-05-18 - Missing ARIA Labels on Icon-Only Buttons
+**Learning:** Found a recurring pattern in `src/renderer/index.html` where icon-only buttons (such as `.win-btn` window controls and `.modal-close-btn` modal close buttons) relied solely on `title` attributes or context instead of having explicit `aria-label` attributes.
+**Action:** Added `aria-label` attributes to these buttons to improve screen reader accessibility. Next time, always ensure all icon-only interactive elements in the codebase are properly labeled.
