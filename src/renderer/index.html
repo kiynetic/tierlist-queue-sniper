@@ -4856,9 +4856,19 @@
       }
     }
 
+    // ⚡ Bolt Optimization: Debounce server search to prevent blocking the main thread
+    // on every keystroke when typing in the search bar, especially with many servers.
+    let searchTimeout = null;
     function handleServerSearch(query) {
       state.searchQuery = query || '';
-      renderServers();
+
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+
+      searchTimeout = setTimeout(() => {
+        renderServers();
+      }, 150); // 150ms debounce
     }
 
     async function toggleChannel(channelId, guildName, channelName, region, toggleEl) {
