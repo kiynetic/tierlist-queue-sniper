@@ -155,14 +155,10 @@ class DiscordClient extends EventEmitter {
     try {
       const str = typeof raw === 'string' ? raw : raw.toString();
 
-      if (
-        str.includes('"t":"PRESENCE_UPDATE"') ||
-        str.includes('"t":"TYPING_START"') ||
-        str.includes('"t":"VOICE_STATE_UPDATE"') ||
-        str.includes('"t":"SESSIONS_REPLACE"') ||
-        str.includes('"t":"CHANNEL_UNREAD_UPDATE"') ||
-        str.includes('"t":"THREAD_LIST_SYNC"')
-      ) {
+      // Performance optimization: Use a single compiled regex instead of multiple .includes()
+      // string scans to quickly ignore high-frequency events without parsing the JSON payload.
+      // This reduces CPU overhead on the main thread for large websocket messages.
+      if (/"t":"(?:PRESENCE_UPDATE|TYPING_START|VOICE_STATE_UPDATE|SESSIONS_REPLACE|CHANNEL_UNREAD_UPDATE|THREAD_LIST_SYNC)"/.test(str)) {
         return;
       }
       const msg = JSON.parse(str);
