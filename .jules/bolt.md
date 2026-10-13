@@ -1,0 +1,3 @@
+## 2025-02-18 - Fast string parsing over WebSocket payload
+**Learning:** In Electron applications dealing with high-frequency WebSocket events (like Discord Gateway), parsing every single message payload using `JSON.parse` or executing multiple `.includes()` string scans on the raw string is extremely CPU intensive on the main thread and can introduce latency for sniping/botting. A single compiled Regular Expression `regex.test(str)` is significantly faster (up to 3x) at checking if a large raw string should be ignored before it is parsed.
+**Action:** When inspecting high-throughput streams or WebSocket events, always try to use a single compiled regex to match ignored patterns early on the raw string before doing any JSON parsing or deeper string scans.
