@@ -3848,7 +3848,7 @@
             <div class="modal-title" style="font-size: 18px; color: #4ade80;">Successfully Entered Queue!</div>
             <div class="modal-subtitle">You have successfully joined the waitlist queue</div>
           </div>
-          <button class="modal-close-btn" onclick="closeQueueEnteredModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" aria-label="Close modal" onclick="closeQueueEnteredModal()"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="queue-entered-body">
@@ -3891,7 +3891,7 @@
               <div class="modal-subtitle" id="updateModalSubtitle">A new version of qPilot is ready to install</div>
             </div>
           </div>
-          <button class="modal-close-btn" onclick="closeUpdateModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" aria-label="Close modal" onclick="closeUpdateModal()"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="modal-body" style="gap: 14px;">
@@ -3940,7 +3940,7 @@
               <div class="modal-subtitle">Connect another account to snipe waitlists concurrently</div>
             </div>
           </div>
-          <button class="modal-close-btn" onclick="closeAddAccountModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" aria-label="Close modal" onclick="closeAddAccountModal()"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="modal-body">
@@ -4027,33 +4027,33 @@
               <div class="modal-subtitle">Snipe any server, waitlist channel, or custom button text</div>
             </div>
           </div>
-          <button class="modal-close-btn" onclick="closeAddCustomModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" aria-label="Close modal" onclick="closeAddCustomModal()"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
 
           <div class="custom-field-group">
-            <label class="custom-field-label">DISCORD SERVER</label>
+            <label class="custom-field-label" for="customServerSelect">DISCORD SERVER</label>
             <select id="customServerSelect" class="custom-modal-select" onchange="onCustomServerChanged(this.value)">
               <option value="">-- Choose a Server --</option>
             </select>
           </div>
 
           <div class="custom-field-group">
-            <label class="custom-field-label">WAITLIST CHANNEL</label>
+            <label class="custom-field-label" for="customChannelSelect">WAITLIST CHANNEL</label>
             <select id="customChannelSelect" class="custom-modal-select" onchange="onCustomChannelChanged(this.value)">
               <option value="">-- Select a Server First --</option>
             </select>
           </div>
 
           <div class="custom-field-group">
-            <label class="custom-field-label">JOIN QUEUE BUTTON TEXT (OPTIONAL)</label>
+            <label class="custom-field-label" for="customButtonLabelInput">JOIN QUEUE BUTTON TEXT (OPTIONAL)</label>
             <input type="text" id="customButtonLabelInput" class="custom-modal-input" placeholder="Join Queue (e.g. Enter Queue, Join Waitlist)">
             <span class="custom-field-hint">Specify the exact button label if the server uses custom text. Defaults to "Join Queue".</span>
           </div>
 
           <div class="custom-field-group">
-            <label class="custom-field-label">REGION / TAG (OPTIONAL)</label>
+            <label class="custom-field-label" for="customRegionInput">REGION / TAG (OPTIONAL)</label>
             <input type="text" id="customRegionInput" class="custom-modal-input" placeholder="e.g. NA, EU, AF, SEA, CUSTOM">
           </div>
 
@@ -4167,7 +4167,7 @@
             <div class="login-divider-line"></div>
           </div>
 
-          <label class="login-input-label">DISCORD ACCOUNT TOKEN</label>
+          <label class="login-input-label" for="discordTokenInput">DISCORD ACCOUNT TOKEN</label>
           <div class="token-input-wrapper">
             <div class="token-input-key-icon" title="Discord Account">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="#5865F2">
