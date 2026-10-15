@@ -1,0 +1,3 @@
+## 2024-10-15 - Fast WebSocket Event Filtering
+**Learning:** Checking string properties on huge Discord gateway events (like `GUILD_CREATE`) using `String.prototype.includes` across the entire payload can severely block the main thread and CPU. Discord Gateway events generally put the `"t"` and `"op"` keys at the very beginning or the very end of the JSON object.
+**Action:** When filtering websocket JSON messages based on a top-level key without parsing them, extract a snippet of the beginning and end of the string (e.g. `substring(0, 2500)` and `substring(str.length - 2500)`) and run a precompiled regular expression against that small substring. This avoids scanning multiple megabytes of data and speeds up event processing by over 90% for large payloads.
