@@ -4856,9 +4856,16 @@
       }
     }
 
+    // ⚡ Bolt Performance Optimization: Debounce server search
+    // Prevents redundant DOM rebuilds while the user is actively typing.
+    // Impact: Significantly improves UI responsiveness and reduces CPU load.
+    let searchTimeoutId = null;
     function handleServerSearch(query) {
       state.searchQuery = query || '';
-      renderServers();
+      if (searchTimeoutId) clearTimeout(searchTimeoutId);
+      searchTimeoutId = setTimeout(() => {
+        renderServers();
+      }, 250);
     }
 
     async function toggleChannel(channelId, guildName, channelName, region, toggleEl) {
