@@ -3992,7 +3992,7 @@
             </div>
             <div class="helper-code-container">
               <div class="helper-code-text" id="modalTokenScript">window.webpackChunkdiscord_app.push([[""],{},e=>{for(let c in e.c)m.push(e.c[c])},m.find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()}])</div>
-              <button type="button" class="copy-snippet-btn" onclick="copyModalTokenScript()" title="Copy snippet">
+              <button type="button" class="copy-snippet-btn" onclick="copyModalTokenScript()" title="Copy snippet" aria-label="Copy snippet">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -4216,7 +4216,7 @@
             <div class="helper-code-container">
               <div class="helper-code-text" id="discordTokenScript">window.webpackChunkdiscord_app.push([[""],{},e=>{for(let c in e.c)m.push(e.c[c])},m.find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()}])</div>
               <div class="copy-feedback-tooltip" id="copyTooltip">Copied!</div>
-              <button type="button" class="copy-snippet-btn" onclick="copyTokenScript()" title="Copy snippet">
+              <button type="button" class="copy-snippet-btn" onclick="copyTokenScript()" title="Copy snippet" aria-label="Copy snippet">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -4779,7 +4779,7 @@
                 </div>
 
                 ${ch.isCustom ? `
-                  <button class="remove-account-btn" onclick="removeCustomWaitlist('${ch.id}', event)" title="Remove custom waitlist" style="margin-left: 4px;">
+                  <button class="remove-account-btn" onclick="removeCustomWaitlist('${ch.id}', event)" title="Remove custom waitlist" aria-label="Remove custom waitlist" style="margin-left: 4px;">
                     <i class="ph ph-x" style="font-size: 12px;"></i>
                   </button>
                 ` : ''}
@@ -5010,7 +5010,7 @@
           </div>
           <div class="account-item-right">
             ${isActive ? `<span class="active-badge">Active</span>` : `<button class="switch-btn">Switch</button>`}
-            <button class="remove-account-btn" onclick="event.stopPropagation(); removeAccount('${acc.id}')" title="Disconnect account">
+            <button class="remove-account-btn" onclick="event.stopPropagation(); removeAccount('${acc.id}')" title="Disconnect account" aria-label="Disconnect account">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"/>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
