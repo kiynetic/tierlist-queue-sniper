@@ -4359,7 +4359,6 @@
       try {
         const serialized = [];
         for (const [id, acc] of state.accounts) {
-
           if (acc.token && acc.token.trim().length > 10) {
             serialized.push({
               id: acc.id,
@@ -4377,7 +4376,10 @@
           await window.api.storeSet('snipeAllAccounts', state.snipeAllAccounts);
         }
 
-        localStorage.setItem('qpilot_accounts', JSON.stringify(serialized));
+        try {
+          localStorage.removeItem('qpilot_accounts');
+          localStorage.removeItem('qpilot_token');
+        } catch (e) {}
         if (state.activeAccountId) {
           localStorage.setItem('qpilot_active_acc', state.activeAccountId);
         }
@@ -4428,6 +4430,11 @@
           }
         }
 
+        try {
+          localStorage.removeItem('qpilot_accounts');
+          localStorage.removeItem('qpilot_token');
+        } catch (e) {}
+
         if (Array.isArray(list) && list.length > 0) {
           state.accounts.clear();
           for (const item of list) {
@@ -4474,6 +4481,7 @@
             const toggle = document.getElementById('snipeAllAccountsCheck');
             if (toggle) toggle.checked = state.snipeAllAccounts;
 
+            await saveAccountsToStorage();
             return true;
           }
         }

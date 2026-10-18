@@ -1,7 +1,9 @@
-const { app, BrowserWindow, Menu, ipcMain, powerMonitor, Tray, nativeImage, dialog, Notification } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, powerMonitor, Tray, nativeImage, dialog, Notification, safeStorage } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
+const crypto = require('crypto');
+const os = require('os');
 const { spawn } = require('child_process');
 const DiscordClient = require('./discord/client');
 const { findLocalDiscordTokens } = require('./discord/tokenFinder');
@@ -36,6 +38,7 @@ if (!gotTheLock) {
   });
 
   app.whenReady().then(() => {
+    migratePlaintextTokensInStore();
     createWindow();
     createTray();
     startIdleMonitor();
@@ -45,6 +48,105 @@ if (!gotTheLock) {
 function getStoreFilePath() {
   const userDataDir = app.getPath('userData');
   return path.join(userDataDir, 'qpilot_store.json');
+}
+
+function getFallbackKey() {
+  const secret = (os.userInfo().username || '') + '-' + (os.homedir() || '') + '-qPilot-secure-vault-salt';
+  return crypto.scryptSync(secret, 'qPilotSalt2026', 32);
+}
+
+function encryptToken(plainText) {
+  if (!plainText || typeof plainText !== 'string') return plainText;
+  if (plainText.startsWith('enc:') || plainText.startsWith('fb:')) return plainText;
+  try {
+    if (safeStorage && safeStorage.isEncryptionAvailable()) {
+      const buffer = safeStorage.encryptString(plainText);
+      return 'enc:' + buffer.toString('base64');
+    }
+  } catch (err) {}
+  try {
+    const key = getFallbackKey();
+    const iv = crypto.randomBytes(12);
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+    const encrypted = Buffer.concat([cipher.update(plainText, 'utf8'), cipher.final()]);
+    const tag = cipher.getAuthTag();
+    const combined = Buffer.concat([iv, tag, encrypted]);
+    return 'fb:' + combined.toString('base64');
+  } catch (err) {
+    return plainText;
+  }
+}
+
+function decryptToken(cipherText) {
+  if (!cipherText || typeof cipherText !== 'string') return cipherText;
+  if (!cipherText.startsWith('enc:') && !cipherText.startsWith('fb:')) return cipherText;
+  if (cipherText.startsWith('enc:')) {
+    try {
+      if (safeStorage && safeStorage.isEncryptionAvailable()) {
+        const b64 = cipherText.slice(4);
+        const buffer = Buffer.from(b64, 'base64');
+        return safeStorage.decryptString(buffer);
+      }
+    } catch (err) {}
+  }
+  if (cipherText.startsWith('fb:')) {
+    try {
+      const key = getFallbackKey();
+      const combined = Buffer.from(cipherText.slice(3), 'base64');
+      const iv = combined.slice(0, 12);
+      const tag = combined.slice(12, 28);
+      const encrypted = combined.slice(28);
+      const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+      decipher.setAuthTag(tag);
+      return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8');
+    } catch (err) {}
+  }
+  return '';
+}
+
+function secureAccountsForStorage(accounts) {
+  if (!Array.isArray(accounts)) return accounts;
+  return accounts.map((acc) => {
+    if (acc && acc.token) {
+      return Object.assign({}, acc, { token: encryptToken(acc.token) });
+    }
+    return acc;
+  });
+}
+
+function revealAccountsFromStorage(accounts) {
+  if (!Array.isArray(accounts)) return accounts;
+  return accounts.map((acc) => {
+    if (acc && acc.token) {
+      return Object.assign({}, acc, { token: decryptToken(acc.token) });
+    }
+    return acc;
+  });
+}
+
+function migratePlaintextTokensInStore() {
+  try {
+    const store = readStore();
+    let changed = false;
+    if (Array.isArray(store.accounts)) {
+      for (let i = 0; i < store.accounts.length; i++) {
+        const acc = store.accounts[i];
+        if (acc && acc.token && !acc.token.startsWith('enc:') && !acc.token.startsWith('fb:')) {
+          acc.token = encryptToken(acc.token);
+          changed = true;
+        }
+      }
+    }
+    if (store.legacyToken && !store.legacyToken.startsWith('enc:') && !store.legacyToken.startsWith('fb:')) {
+      store.legacyToken = encryptToken(store.legacyToken);
+      changed = true;
+    }
+    if (changed) {
+      writeStore(store);
+    }
+  } catch (err) {
+    console.error('[Store] Failed to migrate store tokens:', err);
+  }
 }
 
 function readStore() {
@@ -77,12 +179,34 @@ function writeStore(data) {
 
 ipcMain.handle('store:get', async (event, key) => {
   const store = readStore();
-  return key ? store[key] : store;
+  if (key === 'accounts') {
+    return revealAccountsFromStorage(store.accounts);
+  }
+  if (key === 'legacyToken') {
+    return decryptToken(store.legacyToken);
+  }
+  if (!key) {
+    const copy = Object.assign({}, store);
+    if (copy.accounts) {
+      copy.accounts = revealAccountsFromStorage(copy.accounts);
+    }
+    if (copy.legacyToken) {
+      copy.legacyToken = decryptToken(copy.legacyToken);
+    }
+    return copy;
+  }
+  return store[key];
 });
 
 ipcMain.handle('store:set', async (event, { key, value }) => {
   const store = readStore();
-  store[key] = value;
+  if (key === 'accounts') {
+    store[key] = secureAccountsForStorage(value);
+  } else if (key === 'legacyToken') {
+    store[key] = encryptToken(value);
+  } else {
+    store[key] = value;
+  }
   return writeStore(store);
 });
 
