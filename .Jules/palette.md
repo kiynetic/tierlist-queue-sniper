@@ -1,0 +1,3 @@
+## 2024-05-14 - Missing ARIA Labels on Icon-Only Buttons
+**Learning:** We discovered a pattern in the application where many interactive elements, particularly icon-only buttons (like modal close buttons, toggle visibility buttons, and copy snippet buttons), lacked `aria-label` attributes. This made them inaccessible to screen readers, violating WCAG standards and providing a poor experience for users relying on assistive technologies.
+**Action:** Always ensure that any interactive element, especially icon-only buttons (`<button>`, `<a>`), has a descriptive `aria-label` attribute if the visual text is not present. This pattern should be consistently applied across all new and existing components in the design system.
