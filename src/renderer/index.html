@@ -4864,9 +4864,14 @@
       }
     }
 
+    let searchTimeout = null;
     function handleServerSearch(query) {
+      // ⚡ Bolt Optimization: Debounce search input to reduce DOM manipulations and unnecessary re-renders while typing
       state.searchQuery = query || '';
-      renderServers();
+      if (searchTimeout) clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        renderServers();
+      }, 150);
     }
 
     async function toggleChannel(channelId, guildName, channelName, region, toggleEl) {

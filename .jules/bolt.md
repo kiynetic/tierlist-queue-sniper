@@ -1,0 +1,3 @@
+## 2026-10-19 - Vanilla JS DOM Manipulation Bottlenecks
+**Learning:** In applications using vanilla JS DOM manipulation (like `src/renderer/index.html`), re-rendering entire lists on every keystroke (e.g., search filtering) without a virtual DOM causes severe layout thrashing and blocks the main thread.
+**Action:** Always identify frequent synchronous events (like `oninput`) tied to heavy UI reconstruction and implement debounce (e.g., 150ms) to significantly improve responsiveness.
