@@ -4864,9 +4864,16 @@
       }
     }
 
+    // ⚡ Bolt Performance Optimization:
+    // Debounce the server search input to prevent unnecessary, expensive DOM
+    // reconstructions (`renderServers`) on every single keystroke.
+    let searchTimeout = null;
     function handleServerSearch(query) {
-      state.searchQuery = query || '';
-      renderServers();
+      if (searchTimeout) clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        state.searchQuery = query || '';
+        renderServers();
+      }, 150);
     }
 
     async function toggleChannel(channelId, guildName, channelName, region, toggleEl) {
