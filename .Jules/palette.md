@@ -1,0 +1,3 @@
+## 2024-03-24 - Window Control & Modal Close Accessibility
+**Learning:** Electron native-like window controls (`.win-btn`) and custom modal close buttons (`.modal-close-btn`) often lack explicit `aria-label`s, presenting an accessibility barrier for screen reader users despite having visual icons or `title` attributes.
+**Action:** Always ensure that custom icon-only UI elements, such as those replicating OS window controls or closing modals, include semantic `aria-label` attributes to maintain screen reader accessibility.
