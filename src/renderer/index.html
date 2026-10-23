@@ -4864,9 +4864,16 @@
       }
     }
 
+    let searchDebounceTimeout = null;
     function handleServerSearch(query) {
-      state.searchQuery = query || '';
-      renderServers();
+      // ⚡ Bolt Optimization: Debounce search input to prevent main thread blocking and UI stuttering
+      // The `renderServers` function performs full DOM reconstruction which is expensive.
+      // Delaying it until the user pauses typing improves responsiveness.
+      if (searchDebounceTimeout) clearTimeout(searchDebounceTimeout);
+      searchDebounceTimeout = setTimeout(() => {
+        state.searchQuery = query || '';
+        renderServers();
+      }, 300);
     }
 
     async function toggleChannel(channelId, guildName, channelName, region, toggleEl) {
