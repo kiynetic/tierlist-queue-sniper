@@ -1,0 +1,3 @@
+## 2024-10-25 - Icon-only HTML Buttons in Electron Apps Lack Accessibility
+**Learning:** In Electron applications, native-like window controls (minimize, maximize, close) and custom modal close buttons are frequently implemented as custom, icon-only HTML elements (e.g., using Phosphor Icons). These elements inherently lack textual descriptions, making them entirely inaccessible to screen readers by default.
+**Action:** Always ensure explicit `aria-label` attributes are added to any icon-only button, particularly window controls and modal close buttons, to provide context and maintain screen reader accessibility.
