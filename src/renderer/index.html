@@ -3298,9 +3298,9 @@
       <span>qPilot</span>
     </div>
     <div class="window-controls">
-      <button class="win-btn" onclick="window.api.minimizeWindow()" title="Minimize"><i class="ph ph-minus"></i></button>
-      <button class="win-btn" onclick="window.api.maximizeWindow()" title="Maximize"><i class="ph ph-square"></i></button>
-      <button class="win-btn close" onclick="window.api.closeWindow()" title="Close"><i class="ph ph-x"></i></button>
+      <button class="win-btn" aria-label="Minimize window" onclick="window.api.minimizeWindow()" title="Minimize"><i class="ph ph-minus"></i></button>
+      <button class="win-btn" aria-label="Maximize window" onclick="window.api.maximizeWindow()" title="Maximize"><i class="ph ph-square"></i></button>
+      <button class="win-btn close" aria-label="Close window" onclick="window.api.closeWindow()" title="Close"><i class="ph ph-x"></i></button>
     </div>
   </div>
 
@@ -3463,7 +3463,7 @@
               <i class="ph ph-activity pulse-icon" style="font-size: 16px;"></i>
               <span>Activity</span>
             </div>
-            <button class="clear-logs-btn" onclick="clearActivityLog()">
+            <button class="clear-logs-btn" aria-label="Clear activity logs" onclick="clearActivityLog()">
               <i class="ph ph-trash" style="font-size: 12px;"></i>
               <span>Clear</span>
             </button>
@@ -3848,7 +3848,7 @@
             <div class="modal-title" style="font-size: 18px; color: #4ade80;">Successfully Entered Queue!</div>
             <div class="modal-subtitle">You have successfully joined the waitlist queue</div>
           </div>
-          <button class="modal-close-btn" onclick="closeQueueEnteredModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" aria-label="Close queue entered modal" onclick="closeQueueEnteredModal()"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="queue-entered-body">
@@ -3891,7 +3891,7 @@
               <div class="modal-subtitle" id="updateModalSubtitle">A new version of qPilot is ready to install</div>
             </div>
           </div>
-          <button class="modal-close-btn" onclick="closeUpdateModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" aria-label="Close update modal" onclick="closeUpdateModal()"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="modal-body" style="gap: 14px;">
@@ -3940,7 +3940,7 @@
               <div class="modal-subtitle">Connect another account to snipe waitlists concurrently</div>
             </div>
           </div>
-          <button class="modal-close-btn" onclick="closeAddAccountModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" aria-label="Close add account modal" onclick="closeAddAccountModal()"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="modal-body">
@@ -3967,7 +3967,7 @@
               <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
             </svg>
             <input type="password" id="modalTokenInput" class="modal-token-input" placeholder="Paste Discord user token..." autocomplete="off">
-            <button type="button" class="eye-toggle-btn" onclick="toggleModalTokenVisibility()" title="Show/Hide">
+            <button type="button" class="eye-toggle-btn" aria-label="Show or hide token" onclick="toggleModalTokenVisibility()" title="Show/Hide">
               <svg id="modalEyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                 <circle cx="12" cy="12" r="3"/>
@@ -3992,7 +3992,7 @@
             </div>
             <div class="helper-code-container">
               <div class="helper-code-text" id="modalTokenScript">window.webpackChunkdiscord_app.push([[""],{},e=>{for(let c in e.c)m.push(e.c[c])},m.find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()}])</div>
-              <button type="button" class="copy-snippet-btn" onclick="copyModalTokenScript()" title="Copy snippet">
+              <button type="button" class="copy-snippet-btn" aria-label="Copy snippet" onclick="copyModalTokenScript()" title="Copy snippet">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -4027,7 +4027,7 @@
               <div class="modal-subtitle">Snipe any server, waitlist channel, or custom button text</div>
             </div>
           </div>
-          <button class="modal-close-btn" onclick="closeAddCustomModal()"><i class="ph ph-x"></i></button>
+          <button class="modal-close-btn" aria-label="Close add custom waitlist modal" onclick="closeAddCustomModal()"><i class="ph ph-x"></i></button>
         </div>
 
         <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
@@ -4175,7 +4175,7 @@
               </svg>
             </div>
             <input type="password" id="discordTokenInput" class="token-input-real" placeholder="Paste user token here..." autocomplete="off" spellcheck="false" />
-            <button type="button" class="token-eye-btn" onclick="toggleTokenVisibility()" title="Toggle visibility">
+            <button type="button" class="token-eye-btn" aria-label="Toggle token visibility" onclick="toggleTokenVisibility()" title="Toggle visibility">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eyeIcon">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                 <circle cx="12" cy="12" r="3"/>
@@ -4216,7 +4216,7 @@
             <div class="helper-code-container">
               <div class="helper-code-text" id="discordTokenScript">window.webpackChunkdiscord_app.push([[""],{},e=>{for(let c in e.c)m.push(e.c[c])},m.find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()}])</div>
               <div class="copy-feedback-tooltip" id="copyTooltip">Copied!</div>
-              <button type="button" class="copy-snippet-btn" onclick="copyTokenScript()" title="Copy snippet">
+              <button type="button" class="copy-snippet-btn" aria-label="Copy snippet" onclick="copyTokenScript()" title="Copy snippet">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -4787,7 +4787,7 @@
                 </div>
 
                 ${ch.isCustom ? `
-                  <button class="remove-account-btn" onclick="removeCustomWaitlist('${ch.id}', event)" title="Remove custom waitlist" style="margin-left: 4px;">
+                  <button class="remove-account-btn" aria-label="Remove custom waitlist" onclick="removeCustomWaitlist('${ch.id}', event)" title="Remove custom waitlist" style="margin-left: 4px;">
                     <i class="ph ph-x" style="font-size: 12px;"></i>
                   </button>
                 ` : ''}
@@ -5018,7 +5018,7 @@
           </div>
           <div class="account-item-right">
             ${isActive ? `<span class="active-badge">Active</span>` : `<button class="switch-btn">Switch</button>`}
-            <button class="remove-account-btn" onclick="event.stopPropagation(); removeAccount('${acc.id}')" title="Disconnect account">
+            <button class="remove-account-btn" aria-label="Disconnect account" onclick="event.stopPropagation(); removeAccount('${acc.id}')" title="Disconnect account">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"/>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
