@@ -4864,9 +4864,15 @@
       }
     }
 
+    // ⚡ Bolt: Prevent main thread blocking and UI stuttering by debouncing
+    // the full DOM reconstruction triggered by renderServers() during rapid typing.
+    let searchDebounceTimeout;
     function handleServerSearch(query) {
-      state.searchQuery = query || '';
-      renderServers();
+      clearTimeout(searchDebounceTimeout);
+      searchDebounceTimeout = setTimeout(() => {
+        state.searchQuery = query || '';
+        renderServers();
+      }, 250);
     }
 
     async function toggleChannel(channelId, guildName, channelName, region, toggleEl) {
