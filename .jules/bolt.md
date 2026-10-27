@@ -1,0 +1,3 @@
+## 2024-05-24 - Debouncing renderServers() for Input Events
+**Learning:** In the qPilot frontend (`src/renderer/index.html`), `renderServers()` causes full, synchronous DOM reconstructions. High-frequency event listeners, such as the `oninput` handler on the search input (`handleServerSearch()`), will block the main thread and cause significant UI stuttering if they trigger these full re-renders without rate limiting.
+**Action:** Always wrap high-frequency DOM-reconstructing functions like `renderServers()` (or the handlers that call them) with debouncing or throttling logic to batch updates and ensure smooth UI performance.
