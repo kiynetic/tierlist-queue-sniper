@@ -4864,9 +4864,18 @@
       }
     }
 
+    // ⚡ Bolt Optimization: Debounce server search to prevent main thread blocking
+    // Repeated keystrokes previously triggered full synchronous DOM reconstructions,
+    // causing UI stuttering. This delays renderServers() until typing stops for 300ms.
+    let searchTimeout = null;
     function handleServerSearch(query) {
       state.searchQuery = query || '';
-      renderServers();
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+      searchTimeout = setTimeout(() => {
+        renderServers();
+      }, 300);
     }
 
     async function toggleChannel(channelId, guildName, channelName, region, toggleEl) {
