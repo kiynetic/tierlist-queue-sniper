@@ -1,0 +1,3 @@
+## 2024-05-18 - Missing ARIA Labels on Native-Like Electron Window Controls and Modals
+**Learning:** Native-like window control buttons (minimize, maximize, close) and custom modal close buttons in Electron apps are often built as custom icon-only HTML elements. Without explicit `aria-label` attributes, screen readers cannot properly convey the purpose of these interactive elements, rendering them inaccessible to users relying on assistive technology.
+**Action:** When working on Electron apps or any custom UI with icon-only controls, always verify that `aria-label`s are applied to ensure functional parity with native OS controls for screen reader users.
