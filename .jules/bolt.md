@@ -1,0 +1,3 @@
+## 2024-10-29 - Vanilla JS DOM Reconstruction Bottleneck
+**Learning:** In the qPilot frontend (`src/renderer/index.html`), state changes often trigger full, synchronous DOM reconstructions (e.g., via `renderServers()`). Because the frontend uses vanilla JavaScript for state management and DOM manipulation without a virtual DOM, frequent synchronous updates cause main thread blocking and UI stuttering.
+**Action:** When working with vanilla JS frontends that reconstruct the DOM on state change, always debounce high-frequency event listeners (like search inputs) to prevent main thread blocking and ensure a smooth user experience.
