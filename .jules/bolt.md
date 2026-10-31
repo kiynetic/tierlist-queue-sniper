@@ -1,0 +1,3 @@
+## 2026-10-31 - Debouncing Vanilla JS Search Inputs
+**Learning:** In vanilla JS applications where state changes trigger full, synchronous DOM reconstructions (like `renderServers()`), high-frequency events like `oninput` can severely block the main thread and cause UI stutter.
+**Action:** Always implement debouncing for search inputs or other high-frequency event listeners that trigger heavy DOM updates to maintain a smooth UI experience.
