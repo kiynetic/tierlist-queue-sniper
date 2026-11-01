@@ -1,0 +1,3 @@
+## 2024-05-24 - Debouncing high-frequency events in Vanilla JS DOM
+**Learning:** State changes in the qPilot vanilla JS frontend trigger full, synchronous DOM reconstructions (e.g., via `renderServers()`). This causes main thread blocking and UI stuttering when high-frequency events, like input changes from search bars, occur.
+**Action:** When implementing new features or optimizing existing ones that involve high-frequency event listeners (like text input fields), always apply debouncing (or throttling) before updating the state and calling render functions to prevent unnecessary DOM rebuilds and ensure a smooth UI.
