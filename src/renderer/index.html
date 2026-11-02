@@ -4864,9 +4864,14 @@
       }
     }
 
+    let searchTimeout;
     function handleServerSearch(query) {
-      state.searchQuery = query || '';
-      renderServers();
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        state.searchQuery = query || '';
+        // ⚡ Bolt: Debounce search input by 250ms to prevent synchronous DOM reconstruction blocking the main thread on every keystroke
+        renderServers();
+      }, 250);
     }
 
     async function toggleChannel(channelId, guildName, channelName, region, toggleEl) {

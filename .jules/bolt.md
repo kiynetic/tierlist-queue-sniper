@@ -1,0 +1,3 @@
+## 2024-05-18 - Full DOM Reconstruction on State Change
+**Learning:** In the qPilot frontend (vanilla JS), state changes often trigger full, synchronous DOM reconstructions (like `renderServers()`). This causes severe main thread blocking and UI stuttering on high-frequency events like search inputs.
+**Action:** Always debounce high-frequency event listeners (e.g., input events) when interacting with render functions in this codebase to prevent blocking.
