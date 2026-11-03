@@ -4864,9 +4864,14 @@
       }
     }
 
+    let searchTimeout;
     function handleServerSearch(query) {
-      state.searchQuery = query || '';
-      renderServers();
+      clearTimeout(searchTimeout);
+      // Debounce to prevent UI stuttering during typing since renderServers rebuilds the DOM synchronously
+      searchTimeout = setTimeout(() => {
+        state.searchQuery = query || '';
+        renderServers();
+      }, 250);
     }
 
     async function toggleChannel(channelId, guildName, channelName, region, toggleEl) {
