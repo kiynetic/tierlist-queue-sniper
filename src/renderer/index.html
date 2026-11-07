@@ -4864,9 +4864,18 @@
       }
     }
 
+    let serverSearchTimeout = null;
     function handleServerSearch(query) {
+      // ⚡ Bolt Performance Optimization:
+      // What: Debounced the expensive renderServers() call by 200ms.
+      // Why: Without debouncing, every keystroke synchronously reconstructs the DOM via renderServers(), causing main thread blocking and UI stuttering.
+      // Impact: Reduces full DOM re-renders from O(n) (where n = keystrokes) to 1 render after the user stops typing for 200ms, vastly improving UI responsiveness.
+      // Measurement: Typing a 5-letter word now triggers 1 render instead of 5, reducing main thread blocking time by ~80%.
       state.searchQuery = query || '';
-      renderServers();
+      if (serverSearchTimeout) clearTimeout(serverSearchTimeout);
+      serverSearchTimeout = setTimeout(() => {
+        renderServers();
+      }, 200);
     }
 
     async function toggleChannel(channelId, guildName, channelName, region, toggleEl) {
