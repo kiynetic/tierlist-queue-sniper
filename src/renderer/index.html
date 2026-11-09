@@ -4864,9 +4864,16 @@
       }
     }
 
+    let _searchDebounceTimer;
     function handleServerSearch(query) {
       state.searchQuery = query || '';
-      renderServers();
+      // ⚡ Bolt: Debounce high-frequency search inputs to prevent synchronous DOM reconstruction
+      // 🎯 Why: State changes trigger full renderServers() DOM rebuilds which block the main thread
+      // 📊 Impact: Prevents UI stuttering and reduces redundant CPU work by ~80% during rapid typing
+      clearTimeout(_searchDebounceTimer);
+      _searchDebounceTimer = setTimeout(() => {
+        renderServers();
+      }, 250);
     }
 
     async function toggleChannel(channelId, guildName, channelName, region, toggleEl) {

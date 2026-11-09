@@ -1,0 +1,3 @@
+## 2024-03-24 - Synchronous DOM Reconstructions in Vanilla JS Frontend
+**Learning:** The qPilot frontend uses vanilla JavaScript (no React/Vue virtual DOM) where state changes often trigger full, synchronous DOM reconstructions (e.g., via `renderServers()`). This creates a significant architectural bottleneck where rapid state updates (like typing in a search input) block the main thread and cause UI stuttering.
+**Action:** Always debounce high-frequency event listeners (like search inputs or rapid button clicks) in this codebase to prevent excessive synchronous DOM rebuilds and keep the main thread free.
