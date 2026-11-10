@@ -1,0 +1,3 @@
+## 2024-05-18 - Synchronous DOM Reconstructions
+**Learning:** In the qPilot frontend (`src/renderer/index.html`), state changes often trigger full, synchronous DOM reconstructions (e.g., via `renderServers()`). High-frequency events can cause main thread blocking and UI stuttering.
+**Action:** Always debounce high-frequency event listeners (like search inputs) that trigger synchronous rendering to avoid performance bottlenecks.
