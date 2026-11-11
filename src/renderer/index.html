@@ -4864,9 +4864,16 @@
       }
     }
 
+    let searchTimeout = null;
+
     function handleServerSearch(query) {
       state.searchQuery = query || '';
-      renderServers();
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+      searchTimeout = setTimeout(() => {
+        renderServers();
+      }, 250);
     }
 
     async function toggleChannel(channelId, guildName, channelName, region, toggleEl) {
