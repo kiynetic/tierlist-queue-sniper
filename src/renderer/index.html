@@ -4864,9 +4864,19 @@
       }
     }
 
+    /*
+     * ⚡ Bolt: Debounce server search input
+     * 💡 What: Implemented a 250ms debounce wrapper for handleServerSearch
+     * 🎯 Why: To prevent high-frequency, synchronous DOM reconstructions in renderServers() that block the main thread and cause UI stuttering during typing.
+     * 📊 Impact: Reduces CPU load and layout thrashing by ensuring the UI only updates after the user pauses typing.
+     */
+    var searchDebounceTimeout;
     function handleServerSearch(query) {
-      state.searchQuery = query || '';
-      renderServers();
+      clearTimeout(searchDebounceTimeout);
+      searchDebounceTimeout = setTimeout(() => {
+        state.searchQuery = query || '';
+        renderServers();
+      }, 250);
     }
 
     async function toggleChannel(channelId, guildName, channelName, region, toggleEl) {
